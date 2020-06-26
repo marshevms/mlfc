@@ -1,0 +1,23 @@
+<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN" "http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
+<node>
+  <interface name="com.github.mlfc.server">
+    <signal name="RealtimeCPUTemp">
+      <arg name="temp" type="i" direction="out"/>
+    </signal>
+    <signal name="RealtimeCPUFanRPM">
+      <arg name="rpm" type="i" direction="out"/>
+    </signal>
+    <signal name="RealtimeGPUTemp">
+      <arg name="temp" type="i" direction="out"/>
+    </signal>
+    <signal name="RealtimeGPUFanRPM">
+      <arg name="rpm" type="i" direction="out"/>
+    </signal>
+    <method name="Start">
+      <arg type="b" direction="out"/>
+    </method>
+    <method name="last_error">
+      <arg type="s" direction="out"/>
+    </method>
+  </interface>
+</node>

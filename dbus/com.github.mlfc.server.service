@@ -1,0 +1,3 @@
+[D-BUS Service]
+Name=com.github.mlfc.server
+Exec=/.../mlfc_server
