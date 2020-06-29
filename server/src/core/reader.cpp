@@ -47,10 +47,8 @@ int Reader::RealtimeCPUTemp()
     }
     catch (std::ios_base::failure &e)
     {
-        std::cout << strerror(errno) << std::endl;
-        return -1;
+        throw std::runtime_error("While reading realtime CPU temp: " + std::string(strerror(errno)));
     }
-
 }
 
 int Reader::RealtimeCPUFanRPM()
@@ -74,8 +72,7 @@ int Reader::RealtimeCPUFanRPM()
     }
     catch (std::ios_base::failure &e)
     {
-        std::cout << strerror(errno) << std::endl;
-        return -1;
+        throw std::runtime_error("While reading realtime CPU fan rpm: " + std::string(strerror(errno)));
     }
 }
 
@@ -95,8 +92,7 @@ int Reader::RealtimeGPUTemp()
     }
     catch (std::ios_base::failure &e)
     {
-        std::cout << strerror(errno) << std::endl;
-        return -1;
+        throw std::runtime_error("While reading realtime GPU temp: " + std::string(strerror(errno)));
     }
 }
 
@@ -121,8 +117,7 @@ int Reader::RealtimeGPUFanRPM()
     }
     catch (std::ios_base::failure &e)
     {
-        std::cout << strerror(errno) << std::endl;
-        return -1;
+        throw std::runtime_error("While reading realtime GPU fun rpm: " + std::string(strerror(errno)));
     }
 }
 

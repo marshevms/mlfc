@@ -40,8 +40,11 @@ signals:
     void RealtimeGPUTemp(int temp);
     void RealtimeGPUFanRPM(int rpm);
 
+    void AnErrorOccured(QString error);
+
 public slots:
     bool Start();
+
     QString last_error() const;
 
 private:
@@ -52,7 +55,7 @@ private:
 
     QString last_error_;
 
-    void update();
+    void Update();
 
 };
 

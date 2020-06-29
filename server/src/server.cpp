@@ -24,7 +24,7 @@ Server::~Server()
 
 bool Server::Start()
 {
-    connect(timer_, &QTimer::timeout, this, &Server::update);
+    connect(timer_, &QTimer::timeout, this, &Server::Update);
 
     try
     {
@@ -64,13 +64,21 @@ void Server::set_last_error(const QString &error)
     last_error_ = error;
 }
 
-void Server::update()
+void Server::Update()
 {
-    emit RealtimeCPUTemp(reader_->RealtimeCPUTemp());
-    emit RealtimeCPUFanRPM(reader_->RealtimeCPUFanRPM());
+    try
+    {
+        emit RealtimeCPUTemp(reader_->RealtimeCPUTemp());
+        emit RealtimeCPUFanRPM(reader_->RealtimeCPUFanRPM());
 
-    emit RealtimeGPUTemp(reader_->RealtimeGPUTemp());
-    emit RealtimeGPUFanRPM(reader_->RealtimeGPUFanRPM());
+        emit RealtimeGPUTemp(reader_->RealtimeGPUTemp());
+        emit RealtimeGPUFanRPM(reader_->RealtimeGPUFanRPM());
+    }
+    catch (std::runtime_error &e)
+    {
+        set_last_error(e.what());
+        emit AnErrorOccured(last_error());
+    }
 }
 
 
