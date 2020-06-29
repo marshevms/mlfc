@@ -45,10 +45,15 @@ signals:
 public slots:
     bool Start();
 
+    bool SetUpdateInterval(int interval);
+    int UpdateInterval() const;
+
     QString last_error() const;
 
 private:
-    static constexpr int timeout_msecs = 1000;
+    static constexpr int kMinTimeoutSecs = 500;
+    static constexpr int kMaxTimeoutSecs = 3000;
+    static constexpr int kTimeoutSecs = 1000;
 
     QTimer *timer_;
     std::unique_ptr<core::Reader> reader_;

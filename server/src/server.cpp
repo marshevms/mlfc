@@ -37,22 +37,25 @@ bool Server::Start()
     }
 
 
-    timer_->start(timeout_msecs);
+    timer_->start(kTimeoutSecs);
 
     return true;
 }
 
-//bool Server::setTimeEnterval(int msecs)
-//{
-//    qDebug() << "set intervalsaada" << msecs;
-//    if(!timer_)
-//        return false;
+bool Server::SetUpdateInterval(int interval)
+{
+    if(interval < kMinTimeoutSecs && interval > kMaxTimeoutSecs)
+        return false;
 
-//    timer_->setInterval(msecs);
-//    qDebug() << "set interval" << msecs;
+    timer_->setInterval(interval);
 
-//    return true;
-//}
+    return true;
+}
+
+int Server::UpdateInterval() const
+{
+    return timer_->interval();
+}
 
 QString Server::last_error() const
 {
