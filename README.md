@@ -8,6 +8,8 @@ The server part must work with root privileges to read/write to the file.
 The server part only reads the data from the file, therefore, fan speed control at this stage is not available. The client part works like a regular application.
 Communication takes place using the dbus interface.
 
+![Image of Client](doc/images/mlfc_client.png)
+
 ## Installation
 
 I am testing on Ubuntu 18.04
