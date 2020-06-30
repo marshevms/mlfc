@@ -1,11 +1,26 @@
 #ifndef MANAGER_H
 #define MANAGER_H
 
+#include "constants.h"
 
-class manager
+namespace mlfc
+{
+
+namespace core
+{
+
+class Manager
 {
 public:
-    manager();
+    Manager() = default;
+    ~Manager() = default;
+
+    void SetCoolerBoost(CoolerBoost coolerboost);
+
 };
+
+} // namespace core
+
+} // namespace mlfc
 
 #endif // MANAGER_H
