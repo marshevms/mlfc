@@ -4,13 +4,15 @@ import QtQuick.Dialogs 1.2
 import QtQuick.Layouts 1.12
 import QtQuick.Controls.Styles 1.4
 
-import ServerStates 1.0
+import EnumerationStorage 1.0
 
 
 ApplicationWindow{
     id: window
-    width: 500
+    width: 520
     height: 320
+
+    minimumWidth: 520
 
     title: qsTr("MSI Laptop Fun Control")
     visible: true
@@ -143,6 +145,54 @@ ApplicationWindow{
 
         } // ColumnLayout Fun Speed
 
+        ComboBox{
+            id: fanMode
+            Layout.fillWidth: true
+            model: ListModel{
+                id: fanModeModel
+                ListElement {text: "Auto";}
+                ListElement {text: "Basic";}
+                ListElement {text: "Advanced";}
+            }
+            currentIndex: client.fanMode
+
+            onActivated: {
+                client.set_fan_mode(index)
+            }
+        }
+
+        Switch{
+            id: coolerBoost
+
+            Layout.fillWidth: true
+
+            text: qsTr("Cooler Boost")
+            font.pointSize: 14
+
+            checked:  {
+                switch(client.coolerBoost)
+                {
+                case EnumerationStorage.CoolerBoost.Unknown:
+                    false
+                    break
+                case EnumerationStorage.CoolerBoost.OFF:
+                    false
+                    break
+                case EnumerationStorage.CoolerBoost.ONN:
+                    true
+                    break
+                }
+            }
+            onReleased: {
+               client.set_cooller_boost(coolerBoost.checked? EnumerationStorage.CoolerBoost.ON : EnumerationStorage.CoolerBoost.OFF)
+            }
+        }
+
+        Item{
+            Layout.fillHeight: true
+            Layout.fillWidth: true
+        }
+
     } // GridLayout
 
     footer: RowLayout{
@@ -162,16 +212,16 @@ ApplicationWindow{
             visible: {
                 switch(client.serverState)
                 {
-                case ServerStates.None:
+                case EnumerationStorage.ServerStates.Unknown:
                     false
                     break
-                case ServerStates.Starting:
+                case EnumerationStorage.ServerStates.Starting:
                     false
                     break
-                case ServerStates.Working:
+                case EnumerationStorage.ServerStates.Working:
                     false
                     break
-                case ServerStates.Stopped:
+                case EnumerationStorage.ServerStates.Stopped:
                     true
                     break
                 }

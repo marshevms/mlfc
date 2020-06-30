@@ -4,11 +4,24 @@
 
 #include <QDBusConnection>
 #include <QDBusServiceWatcher>
+#include <QDebug>
+#include <qdbusmetatype.h>
 
 #include "client.h"
-#include "serverstates.h"
+#include "enumerationstorage.h"
 #include "cpu.h"
 #include "gpu.h"
+
+
+
+void RegisterMetaType()
+{
+    qmlRegisterUncreatableMetaObject(mlfc::EnumerationStorage::staticMetaObject, "EnumerationStorage", 1, 0, "EnumerationStorage", "Access to enums & flags only");
+
+    qDBusRegisterMetaType<mlfc::EnumerationStorage::CoolerBoost>();
+    qDBusRegisterMetaType<mlfc::EnumerationStorage::FanMode>();
+}
+
 
 int main(int argc, char **argv)
 {
@@ -23,8 +36,7 @@ int main(int argc, char **argv)
 
     QGuiApplication app(argc, argv);
 
-    qRegisterMetaType<mlfc::ServerStates>("mlfc::ServerStates");
-    qmlRegisterUncreatableMetaObject(mlfc::staticMetaObject, "ServerStates", 1, 0, "ServerStates", "Access to enums & flags only");
+    RegisterMetaType();
 
     mlfc::CPU cpu;
     mlfc::GPU gpu;
