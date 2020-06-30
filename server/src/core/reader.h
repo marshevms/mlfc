@@ -3,6 +3,8 @@
 
 #include <fstream>
 
+#include "constants.h"
+
 namespace mlfc
 {
 
@@ -23,6 +25,8 @@ public:
     int RealtimeGPUTemp();
     int RealtimeGPUFanRPM();
 
+    enum FanMode FanMode();
+    enum CoolerBoost CoolerBoost();
 
 private:
     std::fstream file_;

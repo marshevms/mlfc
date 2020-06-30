@@ -15,6 +15,8 @@ set(mlfc_headers
     src/core/constants.h
     src/core/reader.h
     src/serveradapter.h
+    src/utils/utils.h
+    src/core/manager.h
 )
 
 set(mlfc_sources
@@ -23,6 +25,8 @@ set(mlfc_sources
     src/core/constants.cpp
     src/core/reader.cpp
     src/serveradapter.cpp
+    src/utils/utils.cpp
+    src/core/manager.cpp
 )
 
 #Dbus
