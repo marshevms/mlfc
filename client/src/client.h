@@ -87,7 +87,7 @@ private:
     CPU *cpu_;
     GPU *gpu_;
 
-    ServerInterface *server;
+    ServerInterface *server_;
 
     EnumerationStorage::ServerStates server_state_;
     CoolerBoost cooler_boost_;
