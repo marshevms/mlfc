@@ -13,7 +13,6 @@ set(mlfc_headers
     src/cpu.h
     src/gpu.h
     src/client.h
-    src/serverstates.h
     src/enumerationstorage.h
 )
 
