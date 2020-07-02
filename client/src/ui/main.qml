@@ -14,7 +14,7 @@ ApplicationWindow{
 
     minimumWidth: 520
 
-    title: qsTr("MSI Laptop Fun Control")
+    title: qsTr("MSI Laptop Fan Control")
     visible: true
 
     Connections
@@ -101,14 +101,14 @@ ApplicationWindow{
 
         } // ColumnLayout Temperature
 
-        //Fun speed
+        //Fan speed
         ColumnLayout{
             Layout.margins: 10
             Layout.alignment: Qt.AlignLeft | Qt.AlignTop
             Layout.fillWidth: true
 
             Label{
-                text: qsTr("Fun Speed")
+                text: qsTr("Fan Speed")
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
             }
 
@@ -143,7 +143,7 @@ ApplicationWindow{
                 } // GridLayout
             } // Frame
 
-        } // ColumnLayout Fun Speed
+        } // ColumnLayout Fan Speed
 
         ComboBox{
             id: fanMode

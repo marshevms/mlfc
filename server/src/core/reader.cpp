@@ -116,7 +116,7 @@ int Reader::RealtimeGPUFanRPM()
     }
     catch (std::ios_base::failure &e)
     {
-        throw std::runtime_error("While reading realtime GPU fun rpm: " + std::string(strerror(errno)));
+        throw std::runtime_error("While reading realtime GPU fan rpm: " + std::string(strerror(errno)));
     }
 }
 
