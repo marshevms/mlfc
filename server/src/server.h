@@ -13,8 +13,6 @@ namespace mlfc
 
 namespace core
 {
-
-class Reader;
 class Manager;
 enum class FanMode;
 enum class CoolerBoost;
@@ -58,6 +56,7 @@ public slots:
     enum core::CoolerBoost CoolerBoost();
 
     bool SetCoolerBoost(core::CoolerBoost cooler_boost);
+    bool SetFanMode(core::FanMode fan_mode);
 
     bool SetUpdateInterval(int interval);
     int UpdateInterval() const;
@@ -72,7 +71,6 @@ private:
     ServerStatus server_status_;
 
     QTimer *timer_;
-    std::unique_ptr<core::Reader> reader_;
     std::unique_ptr<core::Manager> manager_;
 
     QString last_error_;

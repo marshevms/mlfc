@@ -29,6 +29,12 @@ public Q_SLOTS: // METHODS
         return asyncCallWithArgumentList(QStringLiteral("CoolerBoost"), argumentList);
     }
 
+    inline QDBusPendingReply<EnumerationStorage::FanMode> FanMode()
+    {
+        QList<QVariant> argumentList;
+        return asyncCallWithArgumentList(QStringLiteral("FanMode"), argumentList);
+    }
+
     inline QDBusPendingReply<bool> SetCoolerBoost(EnumerationStorage::CoolerBoost cooler_boost)
     {
         QList<QVariant> argumentList;
@@ -36,10 +42,11 @@ public Q_SLOTS: // METHODS
         return asyncCallWithArgumentList(QStringLiteral("SetCoolerBoost"), argumentList);
     }
 
-    inline QDBusPendingReply<EnumerationStorage::FanMode> FanMode()
+    inline QDBusPendingReply<bool> SetFanMode(EnumerationStorage::FanMode fan_mode)
     {
         QList<QVariant> argumentList;
-        return asyncCallWithArgumentList(QStringLiteral("FanMode"), argumentList);
+        argumentList << QVariant::fromValue(fan_mode);
+        return asyncCallWithArgumentList(QStringLiteral("SetFanMode"), argumentList);
     }
 
     inline QDBusPendingReply<bool> SetUpdateInterval(int interval)

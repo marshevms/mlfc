@@ -137,6 +137,21 @@ void Client::set_fan_mode(const Client::FanMode fan_mode)
 
 void Client::set_fan_mode(const int fan_mode)
 {
+    auto res = server_->SetFanMode(static_cast<FanMode>(fan_mode));
+    res.waitForFinished();
+
+    if(res.isError())
+    {
+        emit errorOccurred(res.error().message());
+        return;
+    }
+
+    if(!res.value())
+    {
+        emit errorOccurred(server_->last_error().value());
+        return;
+    }
+
     set_fan_mode(static_cast<FanMode>(fan_mode));
 }
 

@@ -3,7 +3,6 @@
 #include <QTimer>
 
 #include "serveradapter.h"
-#include "core/reader.h"
 #include "core/manager.h"
 
 namespace mlfc
@@ -13,7 +12,6 @@ Server::Server(QObject *parent)
     : QObject(parent)
     , server_status_(ServerStatus::kOFF)
     , timer_(new QTimer(this))
-    , reader_(nullptr)
     , manager_(nullptr)
 {
 }
@@ -30,7 +28,6 @@ bool Server::Start()
 
     try
     {
-        reader_.reset(new mlfc::core::Reader());
         manager_.reset(new mlfc::core::Manager());
     }
     catch (std::runtime_error &e)
@@ -56,7 +53,7 @@ core::FanMode Server::FanMode()
 
     try
     {
-        return reader_->FanMode();
+        return manager_->FanMode();
     }
     catch (std::runtime_error &e)
     {
@@ -77,7 +74,7 @@ core::CoolerBoost Server::CoolerBoost()
 
     try
     {
-        return reader_->CoolerBoost();
+        return manager_->CoolerBoost();
     }
     catch (std::runtime_error &e)
     {
@@ -99,6 +96,29 @@ bool Server::SetCoolerBoost(core::CoolerBoost cooler_boost)
     try
     {
         manager_->SetCoolerBoost(cooler_boost);
+
+        return true;
+    }
+    catch (std::runtime_error &e)
+    {
+        set_last_error(e.what());
+        emit AnErrorOccured(last_error());
+    }
+
+    return false;
+}
+
+bool Server::SetFanMode(core::FanMode fan_mode)
+{
+    if(server_status_ == ServerStatus::kOFF)
+    {
+        set_last_error({"Server is not started yet"});
+        return false;
+    }
+
+    try
+    {
+        manager_->SetFanMode(fan_mode);
 
         return true;
     }
@@ -140,11 +160,11 @@ void Server::Update()
 {
     try
     {
-        emit RealtimeCPUTemp(reader_->RealtimeCPUTemp());
-        emit RealtimeCPUFanRPM(reader_->RealtimeCPUFanRPM());
+        emit RealtimeCPUTemp(manager_->RealtimeCPUTemp());
+        emit RealtimeCPUFanRPM(manager_->RealtimeCPUFanRPM());
 
-        emit RealtimeGPUTemp(reader_->RealtimeGPUTemp());
-        emit RealtimeGPUFanRPM(reader_->RealtimeGPUFanRPM());
+        emit RealtimeGPUTemp(manager_->RealtimeGPUTemp());
+        emit RealtimeGPUFanRPM(manager_->RealtimeGPUFanRPM());
     }
     catch (std::runtime_error &e)
     {

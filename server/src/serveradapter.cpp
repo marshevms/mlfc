@@ -31,6 +31,11 @@ bool ServerAdapter::SetCoolerBoost(core::CoolerBoost cooler_boost)
     return reinterpret_cast<mlfc::Server*>(this->parent())->SetCoolerBoost(cooler_boost);
 }
 
+bool ServerAdapter::SetFanMode(core::FanMode fan_mode)
+{
+    return reinterpret_cast<mlfc::Server*>(this->parent())->SetFanMode(fan_mode);
+}
+
 
 bool ServerAdapter::SetUpdateInterval(int interval)
 {
