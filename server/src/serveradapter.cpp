@@ -36,6 +36,26 @@ bool ServerAdapter::SetFanMode(core::FanMode fan_mode)
     return reinterpret_cast<mlfc::Server*>(this->parent())->SetFanMode(fan_mode);
 }
 
+QVector<int> ServerAdapter::CPUTemps()
+{
+    return reinterpret_cast<mlfc::Server*>(this->parent())->CPUTemps();
+}
+
+QVector<int> ServerAdapter::CPUFanSpeeds()
+{
+    return reinterpret_cast<mlfc::Server*>(this->parent())->CPUFanSpeeds();
+}
+
+QVector<int> ServerAdapter::GPUTemps()
+{
+    return reinterpret_cast<mlfc::Server*>(this->parent())->GPUTemps();
+}
+
+QVector<int> ServerAdapter::GPUFanSpeeds()
+{
+    return reinterpret_cast<mlfc::Server*>(this->parent())->GPUFanSpeeds();
+}
+
 
 bool ServerAdapter::SetUpdateInterval(int interval)
 {

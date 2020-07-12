@@ -2,6 +2,7 @@
 #define READER_H
 
 #include <fstream>
+#include <vector>
 
 #include "constants.h"
 
@@ -20,10 +21,14 @@ public:
     //CPU
     int RealtimeCPUTemp();
     int RealtimeCPUFanRPM();
+    std::vector<int> CPUTemps();
+    std::vector<int> CPUFanSpeeds();
 
     //GPU
     int RealtimeGPUTemp();
     int RealtimeGPUFanRPM();
+    std::vector<int> GPUTemps();
+    std::vector<int> GPUFanSpeeds();
 
     enum FanMode FanMode();
     enum CoolerBoost CoolerBoost();

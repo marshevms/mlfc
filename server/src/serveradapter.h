@@ -35,6 +35,12 @@ public slots:
     bool SetCoolerBoost(core::CoolerBoost cooler_boost);
     bool SetFanMode(core::FanMode fan_mode);
 
+    QVector<int> CPUTemps();
+    QVector<int> CPUFanSpeeds();
+
+    QVector<int> GPUTemps();
+    QVector<int> GPUFanSpeeds();
+
     bool SetUpdateInterval(int interval);
     int UpdateInterval() const;
 
