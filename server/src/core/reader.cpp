@@ -75,6 +75,62 @@ int Reader::RealtimeCPUFanRPM()
     }
 }
 
+std::vector<int> Reader::CPUTemps()
+{
+    try
+    {
+        file_.seekg(cpu::kTemps[0]);
+
+        unsigned char data[cpu::kTemps.size()];
+        file_.read(reinterpret_cast<char*>(&data), sizeof (data));
+
+        if(file_.gcount() != cpu::kTemps.size())
+            return {};
+
+        std::vector<int> res;
+        res.reserve(cpu::kTemps.size());
+
+        for(size_t i = 0; i < cpu::kTemps.size(); ++i)
+        {
+            res.push_back(data[i]);
+        }
+
+        return res;
+    }
+    catch (std::ios_base::failure &e)
+    {
+        throw std::runtime_error("While reading CPU temps: " + std::string(strerror(errno)));
+    }
+}
+
+std::vector<int> Reader::CPUFanSpeeds()
+{
+    try
+    {
+        file_.seekg(cpu::kFanSpeeds[0]);
+
+        unsigned char data[cpu::kFanSpeeds.size()];
+        file_.read(reinterpret_cast<char*>(&data), sizeof (data));
+
+        if(file_.gcount() != cpu::kFanSpeeds.size())
+            return {};
+
+        std::vector<int> res;
+        res.reserve(cpu::kFanSpeeds.size());
+
+        for(size_t i = 0; i < cpu::kFanSpeeds.size(); ++i)
+        {
+            res.push_back(data[i]);
+        }
+
+        return res;
+    }
+    catch (std::ios_base::failure &e)
+    {
+        throw std::runtime_error("While reading CPU fan speeds: " + std::string(strerror(errno)));
+    }
+}
+
 int Reader::RealtimeGPUTemp()
 {
     try
@@ -117,6 +173,62 @@ int Reader::RealtimeGPUFanRPM()
     catch (std::ios_base::failure &e)
     {
         throw std::runtime_error("While reading realtime GPU fan rpm: " + std::string(strerror(errno)));
+    }
+}
+
+std::vector<int> Reader::GPUTemps()
+{
+    try
+    {
+        file_.seekg(gpu::kTemps[0]);
+
+        unsigned char data[gpu::kTemps.size()];
+        file_.read(reinterpret_cast<char*>(&data), sizeof (data));
+
+        if(file_.gcount() != gpu::kTemps.size())
+            return {};
+
+        std::vector<int> res;
+        res.reserve(gpu::kTemps.size());
+
+        for(size_t i = 0; i < gpu::kTemps.size(); ++i)
+        {
+            res.push_back(data[i]);
+        }
+
+        return res;
+    }
+    catch (std::ios_base::failure &e)
+    {
+        throw std::runtime_error("While reading GPU temps: " + std::string(strerror(errno)));
+    }
+}
+
+std::vector<int> Reader::GPUFanSpeeds()
+{
+    try
+    {
+        file_.seekg(gpu::kFanSpeeds[0]);
+
+        unsigned char data[gpu::kFanSpeeds.size()];
+        file_.read(reinterpret_cast<char*>(&data), sizeof (data));
+
+        if(file_.gcount() != gpu::kFanSpeeds.size())
+            return {};
+
+        std::vector<int> res;
+        res.reserve(gpu::kFanSpeeds.size());
+
+        for(size_t i = 0; i < gpu::kFanSpeeds.size(); ++i)
+        {
+            res.push_back(data[i]);
+        }
+
+        return res;
+    }
+    catch (std::ios_base::failure &e)
+    {
+        throw std::runtime_error("While reading GPU fan speeds: " + std::string(strerror(errno)));
     }
 }
 
