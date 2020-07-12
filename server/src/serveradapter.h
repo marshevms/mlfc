@@ -33,6 +33,7 @@ public slots:
     core::CoolerBoost CoolerBoost();
 
     bool SetCoolerBoost(core::CoolerBoost cooler_boost);
+    bool SetFanMode(core::FanMode fan_mode);
 
     bool SetUpdateInterval(int interval);
     int UpdateInterval() const;
