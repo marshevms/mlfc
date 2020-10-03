@@ -6,15 +6,15 @@ namespace mlfc
 CPU::CPU(QObject *parent)
     : QObject(parent)
     , temp_(0)
-    , fan_rpm_(0)
+    , fanRpm_(0)
 {
 
 }
 
-int CPU::set_temp(int temp)
+int CPU::setTemp(int temp)
 {
     temp_ = temp;
-    emit temp_changed();
+    emit tempChanged();
 }
 
 int CPU::temp() const
@@ -22,15 +22,15 @@ int CPU::temp() const
     return temp_;
 }
 
-int CPU::set_fan_rpm(int fan_rpm)
+int CPU::setFanRpm(int fanRpm)
 {
-    fan_rpm_ = fan_rpm;
-    emit fan_rpm_changed();
+    fanRpm_ = fanRpm;
+    emit fanRpmChanged();
 }
 
-int CPU::fan_rpm() const
+int CPU::fanRpm() const
 {
-    return fan_rpm_;
+    return fanRpm_;
 }
 
 } // namespace mlfc

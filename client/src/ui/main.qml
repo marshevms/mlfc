@@ -20,7 +20,7 @@ ApplicationWindow{
     Connections
     {
         target: client
-        onErrorOccurred: {
+        function onErrorOccurred(error) {
             errorMessageBox.setInformativeText(error)
             errorMessageBox.open()
         }
@@ -150,14 +150,14 @@ ApplicationWindow{
             Layout.fillWidth: true
             model: ListModel{
                 id: fanModeModel
-                ListElement {text: "Auto";}
-                ListElement {text: "Basic";}
-                ListElement {text: "Advanced";}
+                ListElement {name: "Auto";}
+                ListElement {name: "Basic";}
+                ListElement {name: "Advanced";}
             }
             currentIndex: client.fanMode
 
             onActivated: {
-                client.set_fan_mode(index)
+                client.setFanMode(index)
             }
         }
 
@@ -178,13 +178,13 @@ ApplicationWindow{
                 case EnumerationStorage.CoolerBoost.OFF:
                     false
                     break
-                case EnumerationStorage.CoolerBoost.ONN:
+                case EnumerationStorage.CoolerBoost.ON:
                     true
                     break
                 }
             }
             onReleased: {
-               client.set_cooller_boost(coolerBoost.checked? EnumerationStorage.CoolerBoost.ON : EnumerationStorage.CoolerBoost.OFF)
+               client.setCoollerBoost(coolerBoost.checked? EnumerationStorage.CoolerBoost.ON : EnumerationStorage.CoolerBoost.OFF)
             }
         }
 
