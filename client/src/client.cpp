@@ -56,19 +56,19 @@ void Client::set_last_error(const QString &error)
     last_error_ = error;
 }
 
-int Client::server_state()
+Client::ServerStates Client::server_state()
 {
-    return static_cast<int>(server_state_);
+    return server_state_;
 }
 
-int Client::cooler_boost()
+Client::CoolerBoost Client::cooler_boost()
 {
-    return static_cast<int>(cooler_boost_);
+    return cooler_boost_;
 }
 
-int Client::fan_mode()
+Client::FanMode Client::fan_mode()
 {
-    return static_cast<int>(fan_mode_);
+    return fan_mode_;
 }
 
 void Client::set_cpu_temp(int temp)
@@ -95,19 +95,9 @@ void Client::set_gpu_fan_rmp(int rpm)
     //    qDebug() << "gpu: " << rpm;
 }
 
-void Client::set_cooller_boost(const CoolerBoost cooler_boost)
+void Client::set_cooller_boost(const mlfc::EnumerationStorage::CoolerBoost cooler_boost)
 {
-    if(cooler_boost_ != cooler_boost)
-    {
-        cooler_boost_ = cooler_boost;
-
-        coolerBoostChanged();
-    }
-}
-
-void Client::set_cooller_boost(const int cooler_boost)
-{
-    auto res = server_->SetCoolerBoost(static_cast<CoolerBoost>(cooler_boost));
+    auto res = server_->SetCoolerBoost(cooler_boost);
     res.waitForFinished();
 
     if(res.isError())
@@ -121,11 +111,9 @@ void Client::set_cooller_boost(const int cooler_boost)
         emit errorOccurred(server_->last_error().value());
         return;
     }
-
-    set_cooller_boost(static_cast<CoolerBoost>(cooler_boost));
 }
 
-void Client::set_fan_mode(const Client::FanMode fan_mode)
+void Client::set_fan_mode(const mlfc::EnumerationStorage::FanMode fan_mode)
 {
     if(fan_mode_ != fan_mode)
     {
@@ -155,7 +143,7 @@ void Client::set_fan_mode(const int fan_mode)
     set_fan_mode(static_cast<FanMode>(fan_mode));
 }
 
-void Client::set_server_state(const EnumerationStorage::ServerStates state)
+void Client::set_server_state(const mlfc::EnumerationStorage::ServerStates state)
 {
     server_state_ = state;
     emit serverStateChanged();
@@ -219,7 +207,12 @@ void Client::tryStartServer()
                     return;
                 }
 
-                set_cooller_boost(coolerboost.value());
+                if(cooler_boost_ != coolerboost.value())
+                {
+                    cooler_boost_ = coolerboost.value();
+
+                    coolerBoostChanged();
+                }
                 set_fan_mode(fanmode.value());
             });
             timer->start(1000);

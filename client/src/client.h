@@ -19,15 +19,15 @@ namespace mlfc
 
 class Client : public QObject
 {
-    using FanMode = EnumerationStorage::FanMode;
-    using ServerStates = EnumerationStorage::ServerStates;
-    using CoolerBoost = EnumerationStorage::CoolerBoost;
+    using FanMode = mlfc::EnumerationStorage::FanMode;
+    using ServerStates = mlfc::EnumerationStorage::ServerStates;
+    using CoolerBoost = mlfc::EnumerationStorage::CoolerBoost;
 
     Q_OBJECT
     Q_CLASSINFO("D-Bus Interface", "com.github.mlfc.client")
-    Q_PROPERTY(int serverState READ server_state NOTIFY serverStateChanged)
-    Q_PROPERTY(int coolerBoost READ cooler_boost NOTIFY coolerBoostChanged)
-    Q_PROPERTY(int fanMode READ fan_mode NOTIFY fanModeChanged)
+    Q_PROPERTY(mlfc::EnumerationStorage::ServerStates serverState READ server_state NOTIFY serverStateChanged)
+    Q_PROPERTY(mlfc::EnumerationStorage::CoolerBoost coolerBoost READ cooler_boost NOTIFY coolerBoostChanged)
+    Q_PROPERTY(mlfc::EnumerationStorage::FanMode fanMode READ fan_mode NOTIFY fanModeChanged)
 public:
 
 
@@ -38,9 +38,9 @@ public:
     QString last_error() const;
     void set_last_error(const QString &error);
 
-    int server_state();
-    int cooler_boost();
-    int fan_mode();
+    ServerStates server_state();
+    CoolerBoost cooler_boost();
+    FanMode fan_mode();
 
 signals:
     /**
@@ -77,10 +77,9 @@ public slots:
     void set_gpu_temp(int temp);
     void set_gpu_fan_rmp(int rpm);
 
-    void set_cooller_boost(const CoolerBoost cooler_boost);
-    void set_cooller_boost(const int cooler_boost);
+    void set_cooller_boost(const mlfc::EnumerationStorage::CoolerBoost cooler_boost);
 
-    void set_fan_mode(const FanMode fan_mode);
+    void set_fan_mode(const mlfc::EnumerationStorage::FanMode fan_mode);
     void set_fan_mode(const int fan_mode);
 
 private:
@@ -89,13 +88,13 @@ private:
 
     ServerInterface *server_;
 
-    EnumerationStorage::ServerStates server_state_;
+    ServerStates server_state_;
     CoolerBoost cooler_boost_;
     FanMode fan_mode_;
 
     QString last_error_;
 
-    void set_server_state(const ServerStates state);
+    void set_server_state(const mlfc::EnumerationStorage::ServerStates state);
 
 };
 
