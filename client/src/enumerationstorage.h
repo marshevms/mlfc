@@ -35,7 +35,7 @@ public:
 
     enum class CoolerBoost
     {
-        ONN,
+        ON,
         OFF,
         Unknown
     };

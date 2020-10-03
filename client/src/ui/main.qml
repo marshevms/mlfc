@@ -178,13 +178,13 @@ ApplicationWindow{
                 case EnumerationStorage.CoolerBoost.OFF:
                     false
                     break
-                case EnumerationStorage.CoolerBoost.ONN:
+                case EnumerationStorage.CoolerBoost.ON:
                     true
                     break
                 }
             }
             onReleased: {
-               client.setCoollerBoost(coolerBoost.checked? EnumerationStorage.CoolerBoost.ONN : EnumerationStorage.CoolerBoost.OFF)
+               client.setCoollerBoost(coolerBoost.checked? EnumerationStorage.CoolerBoost.ON : EnumerationStorage.CoolerBoost.OFF)
             }
         }
 
