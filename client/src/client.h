@@ -25,62 +25,43 @@ class Client : public QObject
 
     Q_OBJECT
     Q_CLASSINFO("D-Bus Interface", "com.github.mlfc.client")
-    Q_PROPERTY(mlfc::EnumerationStorage::ServerStates serverState READ server_state NOTIFY serverStateChanged)
-    Q_PROPERTY(mlfc::EnumerationStorage::CoolerBoost coolerBoost READ cooler_boost NOTIFY coolerBoostChanged)
-    Q_PROPERTY(mlfc::EnumerationStorage::FanMode fanMode READ fan_mode NOTIFY fanModeChanged)
+    Q_PROPERTY(mlfc::EnumerationStorage::ServerStates serverState READ serverState NOTIFY serverStateChanged)
+    Q_PROPERTY(mlfc::EnumerationStorage::CoolerBoost coolerBoost READ coolerBoost NOTIFY coolerBoostChanged)
+    Q_PROPERTY(mlfc::EnumerationStorage::FanMode fanMode READ fanMode NOTIFY fanModeChanged)
 public:
 
 
     explicit Client(QObject *parent = nullptr);
 
-    bool Start(CPU *cpu, GPU *gpu);
+    bool start(CPU *cpu, GPU *gpu);
 
-    QString last_error() const;
-    void set_last_error(const QString &error);
+    QString lastError() const;
+    void setLastError(const QString &error);
 
-    ServerStates server_state();
-    CoolerBoost cooler_boost();
-    FanMode fan_mode();
+    ServerStates serverState();
+    CoolerBoost coolerBoost();
+    FanMode fanMode();
 
 signals:
-    /**
-     * @brief errorOccurred
-     * @param error
-     *
-     * Note: Note that type names must begin with an uppercase letter
-     * in order to be declared as QML object types in a QML file
-     */
     void errorOccurred(QString error);
-    /**
-     * @brief serverStateChanged
-     *
-     * Note: Note that type names must begin with an uppercase letter
-     * in order to be declared as QML object types in a QML file
-     */
     void serverStateChanged();
 
     void coolerBoostChanged();
     void fanModeChanged();
 
 public slots:
-    /**
-     * @brief tryStartServer
-     *
-     * Note: Note that type names must begin with an uppercase letter
-     * in order to be declared as QML object types in a QML file
-     */
     void tryStartServer();
 
-    void set_cpu_temp(int temp);
-    void set_cpu_fan_rmp(int rpm);
+    void setCpuTemp(int temp);
+    void setCpuFanRmp(int rpm);
 
-    void set_gpu_temp(int temp);
-    void set_gpu_fan_rmp(int rpm);
+    void setGpuTemp(int temp);
+    void setGpuFanRmp(int rpm);
 
-    void set_cooller_boost(const mlfc::EnumerationStorage::CoolerBoost cooler_boost);
+    void setCoollerBoost(const mlfc::EnumerationStorage::CoolerBoost coolerBoost);
 
-    void set_fan_mode(const mlfc::EnumerationStorage::FanMode fan_mode);
-    void set_fan_mode(const int fan_mode);
+    void setFanMode(const mlfc::EnumerationStorage::FanMode fanMode);
+    void setFanMode(const int fanMode);
 
 private:
     CPU *cpu_;
@@ -88,13 +69,13 @@ private:
 
     ServerInterface *server_;
 
-    ServerStates server_state_;
-    CoolerBoost cooler_boost_;
-    FanMode fan_mode_;
+    ServerStates serverState_;
+    CoolerBoost coolerBoost_;
+    FanMode fanMode_;
 
-    QString last_error_;
+    QString lastError_;
 
-    void set_server_state(const mlfc::EnumerationStorage::ServerStates state);
+    void setServerState(const mlfc::EnumerationStorage::ServerStates state);
 
 };
 

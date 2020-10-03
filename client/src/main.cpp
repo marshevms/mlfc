@@ -43,9 +43,9 @@ int main(int argc, char **argv)
 
     mlfc::Client client;
 
-    if(!client.Start(&cpu, &gpu))
+    if(!client.start(&cpu, &gpu))
     {
-        qDebug() << client.last_error();
+        qDebug() << client.lastError();
 
         return -1;
     }

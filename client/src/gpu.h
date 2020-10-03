@@ -9,24 +9,24 @@ namespace mlfc
 class GPU : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(int temp READ temp NOTIFY temp_changed)
-    Q_PROPERTY(int fanRPM READ fan_rpm NOTIFY fan_rpm_changed)
+    Q_PROPERTY(int temp READ temp NOTIFY tempChanged)
+    Q_PROPERTY(int fanRPM READ fanRpm NOTIFY fanRpmChanged)
 public:
     explicit GPU(QObject *parent = nullptr);
 
-    int set_temp(int temp);
+    int setTemp(int temp);
     int temp() const;
 
-    int set_fan_rpm(int fan_rpm);
-    int fan_rpm() const;
+    int setFanRpm(int fanRpm);
+    int fanRpm() const;
 
 signals:
-    void temp_changed();
-    void fan_rpm_changed();
+    void tempChanged();
+    void fanRpmChanged();
 
 private:
     int temp_;
-    int fan_rpm_;
+    int fanRpm_;
 
 };
 
