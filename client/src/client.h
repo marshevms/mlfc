@@ -61,7 +61,6 @@ public slots:
     void setCoollerBoost(const mlfc::EnumerationStorage::CoolerBoost coolerBoost);
 
     void setFanMode(const mlfc::EnumerationStorage::FanMode fanMode);
-    void setFanMode(const int fanMode);
 
 private:
     CPU *cpu_;

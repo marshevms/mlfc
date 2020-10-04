@@ -11,11 +11,13 @@
 #include "enumerationstorage.h"
 #include "cpu.h"
 #include "gpu.h"
+#include "fanmodemodel.h"
 
 
 
 void RegisterMetaType()
 {
+    qmlRegisterType<mlfc::FanModeModel>("FanModeModel", 1, 0, "FanModeModel");
     qmlRegisterUncreatableMetaObject(mlfc::EnumerationStorage::staticMetaObject, "EnumerationStorage", 1, 0, "EnumerationStorage", "Access to enums & flags only");
 
     qDBusRegisterMetaType<mlfc::EnumerationStorage::CoolerBoost>();

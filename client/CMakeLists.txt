@@ -14,6 +14,7 @@ set(mlfc_headers
     src/gpu.h
     src/client.h
     src/enumerationstorage.h
+    src/fanmodemodel.h
 )
 
 set(mlfc_sources
@@ -22,6 +23,7 @@ set(mlfc_sources
     src/gpu.cpp
     src/client.cpp
     src/serverinterface.cpp
+    src/fanmodemodel.cpp
 )
 include_directories(${CMAKE_SOURCE_DIR}/server/src/utils)
 

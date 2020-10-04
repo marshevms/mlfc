@@ -115,17 +115,7 @@ void Client::setCoollerBoost(const mlfc::EnumerationStorage::CoolerBoost coolerB
 
 void Client::setFanMode(const mlfc::EnumerationStorage::FanMode fanMode)
 {
-    if(fanMode_ != fanMode)
-    {
-        fanMode_ = fanMode;
-
-        fanModeChanged();
-    }
-}
-
-void Client::setFanMode(const int fanMode)
-{
-    auto res = server_->setFanMode(static_cast<FanMode>(fanMode));
+    auto res = server_->setFanMode(fanMode);
     res.waitForFinished();
 
     if(res.isError())
@@ -140,8 +130,8 @@ void Client::setFanMode(const int fanMode)
         return;
     }
 
-    setFanMode(static_cast<FanMode>(fanMode));
 }
+
 
 void Client::setServerState(const mlfc::EnumerationStorage::ServerStates state)
 {
@@ -213,7 +203,15 @@ void Client::tryStartServer()
 
                     coolerBoostChanged();
                 }
-                setFanMode(fanmode.value());
+
+                if(fanMode_ != fanmode.value())
+                {
+                    fanMode_ = fanmode.value();
+                    qDebug() << fanMode();
+
+                    fanModeChanged();
+                }
+
             });
             timer->start(1000);
         }

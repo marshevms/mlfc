@@ -5,6 +5,7 @@ import QtQuick.Layouts 1.12
 import QtQuick.Controls.Styles 1.4
 
 import EnumerationStorage 1.0
+import FanModeModel 1.0
 
 
 ApplicationWindow{
@@ -24,6 +25,10 @@ ApplicationWindow{
             errorMessageBox.setInformativeText(error)
             errorMessageBox.open()
         }
+    }
+
+    FanModeModel{
+        id: fanModeModel
     }
 
     MessageDialog
@@ -148,16 +153,13 @@ ApplicationWindow{
         ComboBox{
             id: fanMode
             Layout.fillWidth: true
-            model: ListModel{
-                id: fanModeModel
-                ListElement {name: "Auto";}
-                ListElement {name: "Basic";}
-                ListElement {name: "Advanced";}
-            }
-            currentIndex: client.fanMode
 
+            textRole: "textRole"
+            valueRole: "valueRole"
+            model: fanModeModel
+            currentIndex: client.fanMode
             onActivated: {
-                client.setFanMode(index)
+                client.setFanMode(currentValue)
             }
         }
 
