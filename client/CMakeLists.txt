@@ -6,7 +6,7 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
-find_package(Qt5 COMPONENTS Core DBus Quick REQUIRED)
+find_package(Qt5 COMPONENTS Widgets Core DBus Quick REQUIRED)
 find_package(Qt5QuickCompiler)
 
 set(mlfc_headers
@@ -45,5 +45,5 @@ qtquick_compiler_add_resources(qml_resources
 #======================Quick===============================
 
 add_executable(${PROJECT_NAME} ${mlfc_sources} ${mlfc_headers} ${qml_resources})
-target_link_libraries(${PROJECT_NAME} Qt5::Core Qt5::DBus Qt5::Quick)
+target_link_libraries(${PROJECT_NAME} Qt5::Widgets Qt5::Core Qt5::DBus Qt5::Quick)
 
