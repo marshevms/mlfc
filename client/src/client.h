@@ -2,6 +2,7 @@
 #define CLIENT_H
 
 #include <QObject>
+#include <QPoint>
 
 #include "serverinterface.h"
 #include "enumerationstorage.h"
@@ -22,12 +23,14 @@ class Client : public QObject
     using FanMode = mlfc::EnumerationStorage::FanMode;
     using ServerStates = mlfc::EnumerationStorage::ServerStates;
     using CoolerBoost = mlfc::EnumerationStorage::CoolerBoost;
+    using ChartValues = mlfc::EnumerationStorage::ChartValues;
 
     Q_OBJECT
     Q_CLASSINFO("D-Bus Interface", "com.github.mlfc.client")
     Q_PROPERTY(mlfc::EnumerationStorage::ServerStates serverState READ serverState NOTIFY serverStateChanged)
     Q_PROPERTY(mlfc::EnumerationStorage::CoolerBoost coolerBoost READ coolerBoost NOTIFY coolerBoostChanged)
     Q_PROPERTY(mlfc::EnumerationStorage::FanMode fanMode READ fanMode NOTIFY fanModeChanged)
+    Q_PROPERTY(mlfc::EnumerationStorage::ChartValues chartValues READ chartValues WRITE setChartValues NOTIFY chartValuesChanged)
 public:
 
 
@@ -41,6 +44,7 @@ public:
     ServerStates serverState();
     CoolerBoost coolerBoost();
     FanMode fanMode();
+    ChartValues chartValues();
 
 signals:
     void errorOccurred(QString error);
@@ -49,18 +53,16 @@ signals:
     void coolerBoostChanged();
     void fanModeChanged();
 
+    void chartValuesChanged();
+
 public slots:
-    void tryStartServer();
-
-    void setCpuTemp(int temp);
-    void setCpuFanRmp(int rpm);
-
-    void setGpuTemp(int temp);
-    void setGpuFanRmp(int rpm);
+    void init();
 
     void setCoollerBoost(const mlfc::EnumerationStorage::CoolerBoost coolerBoost);
-
     void setFanMode(const mlfc::EnumerationStorage::FanMode fanMode);
+    void setChartValues(const mlfc::EnumerationStorage::ChartValues chartValues);
+
+    void saveChartValues(const QVector<QPoint> &values);
 
 private:
     CPU *cpu_;
@@ -71,8 +73,34 @@ private:
     ServerStates serverState_;
     CoolerBoost coolerBoost_;
     FanMode fanMode_;
+    ChartValues chartValues_;
 
     QString lastError_;
+
+    void setCpuTemp(int temp);
+    void setCpuFanRmp(int rpm);
+
+    void setGpuTemp(int temp);
+    void setGpuFanRmp(int rpm);
+
+    void setCpuTemps(const QVector<int> &temps);
+    void setCpuFanSpeeds(const QVector<int> &fanSpeeds);
+
+    void setGpuTemps(const QVector<int> &temps);
+    void setGpuFanSpeeds(const QVector<int> &fanSpeeds);
+
+    QString serverLastError();
+
+    //INIT Functions
+
+    void startServer();
+
+    void updateFanMode();
+    void updateCoolerBoost();
+    void updateCpuTemps();
+    void updateCpuFanSpeeds();
+    void updateGpuTemps();
+    void updateGpuFanSpeeds();
 
     void setServerState(const mlfc::EnumerationStorage::ServerStates state);
 
