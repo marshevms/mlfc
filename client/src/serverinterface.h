@@ -56,6 +56,26 @@ public Q_SLOTS: // METHODS
         return asyncCallWithArgumentList(QStringLiteral("SetUpdateInterval"), argumentList);
     }
 
+    inline QDBusPendingReply<QVector<int>> cpuTemps()
+    {
+        return asyncCallWithArgumentList(QStringLiteral("CPUTemps"), {});
+    }
+
+    inline QDBusPendingReply<QVector<int>> cpuFanSpeeds()
+    {
+        return asyncCallWithArgumentList(QStringLiteral("CPUFanSpeeds"), {});
+    }
+
+    inline QDBusPendingReply<QVector<int>> gpuTemps()
+    {
+        return asyncCallWithArgumentList(QStringLiteral("GPUTemps"), {});
+    }
+
+    inline QDBusPendingReply<QVector<int>> gpuFanSpeeds()
+    {
+        return asyncCallWithArgumentList(QStringLiteral("GPUFanSpeeds"), {});
+    }
+
     inline QDBusPendingReply<bool> start()
     {
         QList<QVariant> argumentList;

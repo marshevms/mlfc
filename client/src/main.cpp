@@ -45,13 +45,6 @@ int main(int argc, char **argv)
 
     mlfc::Client client;
 
-    if(!client.start(&cpu, &gpu))
-    {
-        qDebug() << client.lastError();
-
-        return -1;
-    }
-
     QQmlApplicationEngine engine;
     engine.rootContext()->setContextProperty(QStringLiteral("cpu"), &cpu);
     engine.rootContext()->setContextProperty(QStringLiteral("gpu"), &gpu);
@@ -60,8 +53,12 @@ int main(int argc, char **argv)
     if(engine.rootObjects().isEmpty())
         return -1;
 
+    if(!client.start(&cpu, &gpu))
+    {
+        qDebug() << client.lastError();
 
-
+        return -1;
+    }
 
 //    QDBusServiceWatcher serviceWatcher("com.github.mlfc.server", QDBusConnection::sessionBus(), QDBusServiceWatcher::WatchForRegistration);
 

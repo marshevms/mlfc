@@ -6,6 +6,7 @@
 
 #include "cpu.h"
 #include "gpu.h"
+#include "constants.h"
 
 namespace mlfc
 {
@@ -15,6 +16,7 @@ Client::Client(QObject *parent)
     , serverState_(ServerStates::Unknown)
     , coolerBoost_(CoolerBoost::Unknown)
     , fanMode_(FanMode::Unknown)
+    , chartValues_(ChartValues::CPU)
 {
 }
 
@@ -42,7 +44,7 @@ bool Client::start(CPU *cpu, GPU *gpu)
     connect(server_, &ServerInterface::RealtimeGPUTemp, this, &Client::setGpuTemp);
     connect(server_, &ServerInterface::RealtimeGPUFanRPM, this, &Client::setGpuFanRmp);
 
-    tryStartServer();
+    init();
     return true;
 }
 
@@ -71,6 +73,11 @@ Client::FanMode Client::fanMode()
     return fanMode_;
 }
 
+Client::ChartValues Client::chartValues()
+{
+    return chartValues_;
+}
+
 void Client::setCpuTemp(int temp)
 {
     cpu_->setTemp(temp);
@@ -95,41 +102,251 @@ void Client::setGpuFanRmp(int rpm)
     //    qDebug() << "gpu: " << rpm;
 }
 
-void Client::setCoollerBoost(const mlfc::EnumerationStorage::CoolerBoost coolerBoost)
+void Client::onSetCoolerBoostClicked(const mlfc::EnumerationStorage::CoolerBoost coolerBoost)
 {
     auto res = server_->setCoolerBoost(coolerBoost);
     res.waitForFinished();
 
     if(res.isError())
     {
+        setCoolerBoost(CoolerBoost::Unknown);
         emit errorOccurred(res.error().message());
         return;
     }
 
     if(!res.value())
     {
-        emit errorOccurred(server_->lastError().value());
+        setCoolerBoost(CoolerBoost::Unknown);
+        emit errorOccurred(serverLastError());
         return;
     }
 }
 
-void Client::setFanMode(const mlfc::EnumerationStorage::FanMode fanMode)
+void Client::onSetFanModeClicked(const mlfc::EnumerationStorage::FanMode fanMode)
 {
     auto res = server_->setFanMode(fanMode);
     res.waitForFinished();
 
     if(res.isError())
     {
+        setFanMode(FanMode::Unknown);
         emit errorOccurred(res.error().message());
         return;
     }
 
     if(!res.value())
     {
-        emit errorOccurred(server_->lastError().value());
+        setFanMode(FanMode::Unknown);
+        emit errorOccurred(serverLastError());
         return;
     }
 
+}
+
+void Client::onSetChartValuesClicked(const EnumerationStorage::ChartValues chartValues)
+{
+    chartValues_ = chartValues;
+    emit chartValuesChanged();
+}
+
+void Client::onSaveChartValuesClicked(const QVector<QPoint> &values)
+{
+    QVector<int> temps;
+    QVector<int> fanSpeeds;
+
+    temps.reserve(kTempsNumber);
+    fanSpeeds.reserve(kFanSpeedsNumber);
+
+    std::transform(values.begin() + 1, values.end(), std::back_inserter(temps), [](const QPoint &point){
+        return point.x();
+    });
+
+    std::transform(values.begin(), values.end(), std::back_inserter(fanSpeeds), [](const QPoint &point){
+        return point.y();
+    });
+
+    switch (chartValues_) {
+    case ChartValues::CPU:
+        qDebug() << "INFO: Trying to change cpu values";
+        cpu_->setTemps(temps);
+        cpu_->setFanSpeeds(fanSpeeds);
+        break;
+    case ChartValues::GPU:
+        qDebug() << "INFO: Trying to change gpu values";
+        gpu_->setTemps(temps);
+        gpu_->setFanSpeeds(fanSpeeds);
+        break;
+    }
+}
+
+void Client::setCoolerBoost(const EnumerationStorage::CoolerBoost coolerBoost)
+{
+    coolerBoost_ = coolerBoost;
+    emit coolerBoostChanged();
+}
+
+void Client::setFanMode(const EnumerationStorage::FanMode fanMode)
+{
+    fanMode_ = fanMode;
+    emit fanModeChanged();
+}
+
+void Client::init()
+{
+    startServer();
+
+    if (ServerStates::Working != serverState())
+        return;
+
+    updateFanMode();
+    updateCoolerBoost();
+
+    updateCpuTemps();
+    updateCpuFanSpeeds();
+
+    updateGpuTemps();
+    updateGpuFanSpeeds();
+
+    QTimer *oneSecTimer = new QTimer(this);
+    QTimer *fiveSecTimer = new QTimer(this);
+
+    connect(oneSecTimer, &QTimer::timeout, this, [=]{
+        updateFanMode();
+        updateCoolerBoost();
+    });
+    connect(fiveSecTimer, &QTimer::timeout, this, [=]{
+        updateCpuTemps();
+        updateCpuFanSpeeds();
+
+        updateGpuTemps();
+        updateGpuFanSpeeds();
+    });
+
+    oneSecTimer->start(1000);
+    fiveSecTimer->start(5000);
+}
+
+void Client::startServer()
+{
+    setServerState(ServerStates::Starting);
+
+    auto res = server_->start();
+
+    auto value = res.value();
+    if (res.isError())
+    {
+        setServerState(ServerStates::Stopped);
+        emit errorOccurred(res.error().message());
+        return;
+    }
+    if (!value)
+    {
+        setServerState(ServerStates::Stopped);
+        emit errorOccurred(serverLastError());
+        return;
+    }
+
+    return setServerState(ServerStates::Working);
+}
+
+void Client::updateFanMode()
+{
+    auto fanMode = server_->fanMode();
+
+    auto value = fanMode.value();
+    if (fanMode.isError())
+    {
+        emit errorOccurred(fanMode.error().message());
+        return;
+    }
+
+    if (FanMode::Unknown == value)
+    {
+        emit errorOccurred(serverLastError());
+        return;
+    }
+
+    setFanMode(value);
+
+    return;
+}
+
+void Client::updateCoolerBoost()
+{
+    auto coolerBoost = server_->coolerBoost();
+
+    auto value = coolerBoost.value();
+    if (coolerBoost.isError())
+    {
+        emit errorOccurred(coolerBoost.error().message());
+        return;
+    }
+
+    if (CoolerBoost::Unknown == value)
+    {
+        emit errorOccurred(serverLastError());
+        return;
+    }
+
+    setCoolerBoost(value);
+
+    return;
+}
+
+void Client::updateCpuTemps()
+{
+    auto cpuTemps = server_->cpuTemps();
+
+    auto value = cpuTemps.value();
+    if(cpuTemps.isError())
+    {
+        emit errorOccurred(cpuTemps.error().message());
+        return;
+    }
+
+    return setCpuTemps(value);
+}
+
+void Client::updateCpuFanSpeeds()
+{
+    auto cpuFanSpeeds = server_->cpuFanSpeeds();
+
+    auto value = cpuFanSpeeds.value();
+    if(cpuFanSpeeds.isError())
+    {
+        emit errorOccurred(cpuFanSpeeds.error().message());
+        return;
+    }
+
+    return setCpuFanSpeeds(value);
+}
+
+void Client::updateGpuTemps()
+{
+    auto gpuTemps = server_->gpuTemps();
+
+    auto value = gpuTemps.value();
+    if(gpuTemps.isError())
+    {
+        emit errorOccurred(gpuTemps.error().message());
+        return;
+    }
+
+    return setGpuTemps(value);
+}
+
+void Client::updateGpuFanSpeeds()
+{
+    auto gpuFanSpeeds = server_->gpuFanSpeeds();
+
+    auto value = gpuFanSpeeds.value();
+    if(gpuFanSpeeds.isError())
+    {
+        emit errorOccurred(gpuFanSpeeds.error().message());
+        return;
+    }
+
+    return setGpuFanSpeeds(value);
 }
 
 
@@ -139,83 +356,49 @@ void Client::setServerState(const mlfc::EnumerationStorage::ServerStates state)
     emit serverStateChanged();
 }
 
-void Client::tryStartServer()
+void Client::setCpuTemps(const QVector<int> &temps)
 {
-    auto res = server_->start();
+    if (cpu_->setTemps(temps) < 0)
+    {
+        qDebug() << "ERROR: Can't set CPU temps";
+    }
+}
 
-    setServerState(ServerStates::Starting);
+void Client::setCpuFanSpeeds(const QVector<int> &fanSpeeds)
+{
+    if (cpu_->setFanSpeeds(fanSpeeds) < 0)
+    {
+        qDebug() << "ERROR: Can't set CPU fan speeds";
+    }
+}
 
-    QTimer::singleShot(1000, this, [=](){
+void Client::setGpuTemps(const QVector<int> &temps)
+{
+    if (gpu_->setTemps(temps) < 0)
+    {
+        qDebug() << "ERROR: Can't set GPU temps";
+    }
+}
 
-        if(res.isError())
-        {
-            setServerState(ServerStates::Stopped);
-            emit errorOccurred(res.error().message());
-            return;
-        }
+void Client::setGpuFanSpeeds(const QVector<int> &fanSpeeds)
+{
+    if (gpu_->setFanSpeeds(fanSpeeds) < 0)
+    {
+        qDebug() << "ERROR: Can't set GPU fan speeds";
+    }
+}
 
-        if(res.value() == false)
-        {
-            setServerState(ServerStates::Stopped);
-            emit errorOccurred(server_->lastError().value());
-        }
-        else
-        {
-            setServerState(ServerStates::Working);
+QString Client::serverLastError()
+{
+    auto error = server_->lastError();
 
-            QTimer *timer = new QTimer(this);
+    auto value = error.value();
+    if (error.isError())
+    {
+        return error.error().message();
+    }
 
-            connect(timer, &QTimer::timeout, this, [=]{
-
-                auto fanmode = server_->fanMode();
-                auto coolerboost = server_->coolerBoost();
-
-                fanmode.waitForFinished();
-                coolerboost.waitForFinished();
-
-                if(fanmode.isError())
-                {
-                    emit errorOccurred(res.error().message());
-                    return;
-                }
-
-                if(fanmode.value() == FanMode::Unknown)
-                {
-                    emit errorOccurred(server_->lastError().value());
-                    return;
-                }
-
-                if(coolerboost.isError())
-                {
-                    emit errorOccurred(res.error().message());
-                    return;
-                }
-
-                if(coolerboost.value() == CoolerBoost::Unknown)
-                {
-                    emit errorOccurred(server_->lastError().value());
-                    return;
-                }
-
-                if(coolerBoost_ != coolerboost.value())
-                {
-                    coolerBoost_ = coolerboost.value();
-
-                    coolerBoostChanged();
-                }
-
-                if(fanMode_ != fanmode.value())
-                {
-                    fanMode_ = fanmode.value();
-                    qDebug() << fanMode();
-
-                    fanModeChanged();
-                }
-
-            });
-            timer->start(1000);
-        }
-    });
+    return value;
 }
 
 } // namespace mlfc

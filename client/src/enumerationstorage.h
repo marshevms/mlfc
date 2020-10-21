@@ -40,6 +40,13 @@ public:
         Unknown
     };
     Q_ENUM(CoolerBoost)
+
+    enum class ChartValues
+    {
+        CPU,
+        GPU
+    };
+    Q_ENUM(ChartValues)
 };
 
 } // namespace mlfc
