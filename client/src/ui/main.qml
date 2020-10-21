@@ -192,7 +192,7 @@ ApplicationWindow{
             model: fanModeModel
             currentIndex: client.fanMode
             onActivated: {
-                client.setFanMode(currentValue)
+                client.onSetFanModeClicked(currentValue)
             }
         }
 
@@ -220,7 +220,7 @@ ApplicationWindow{
                 }
             }
             onReleased: {
-               client.setCoollerBoost(coolerBoost.checked? EnumerationStorage.CoolerBoost.ON : EnumerationStorage.CoolerBoost.OFF)
+               client.onSetCoolerBoostClicked(coolerBoost.checked? EnumerationStorage.CoolerBoost.ON : EnumerationStorage.CoolerBoost.OFF)
             }
         }
 
@@ -523,7 +523,7 @@ ApplicationWindow{
                         }
 
                         console.log("INFO: ", values)
-                        client.saveChartValues(values)
+                        client.onSaveChartValuesClicked(values)
                     }
 
                     currentState = !currentState

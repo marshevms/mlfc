@@ -102,50 +102,54 @@ void Client::setGpuFanRmp(int rpm)
     //    qDebug() << "gpu: " << rpm;
 }
 
-void Client::setCoollerBoost(const mlfc::EnumerationStorage::CoolerBoost coolerBoost)
+void Client::onSetCoolerBoostClicked(const mlfc::EnumerationStorage::CoolerBoost coolerBoost)
 {
     auto res = server_->setCoolerBoost(coolerBoost);
     res.waitForFinished();
 
     if(res.isError())
     {
+        setCoolerBoost(CoolerBoost::Unknown);
         emit errorOccurred(res.error().message());
         return;
     }
 
     if(!res.value())
     {
-        emit errorOccurred(server_->lastError().value());
+        setCoolerBoost(CoolerBoost::Unknown);
+        emit errorOccurred(serverLastError());
         return;
     }
 }
 
-void Client::setFanMode(const mlfc::EnumerationStorage::FanMode fanMode)
+void Client::onSetFanModeClicked(const mlfc::EnumerationStorage::FanMode fanMode)
 {
     auto res = server_->setFanMode(fanMode);
     res.waitForFinished();
 
     if(res.isError())
     {
+        setFanMode(FanMode::Unknown);
         emit errorOccurred(res.error().message());
         return;
     }
 
     if(!res.value())
     {
+        setFanMode(FanMode::Unknown);
         emit errorOccurred(serverLastError());
         return;
     }
 
 }
 
-void Client::setChartValues(const EnumerationStorage::ChartValues chartValues)
+void Client::onSetChartValuesClicked(const EnumerationStorage::ChartValues chartValues)
 {
     chartValues_ = chartValues;
     emit chartValuesChanged();
 }
 
-void Client::saveChartValues(const QVector<QPoint> &values)
+void Client::onSaveChartValuesClicked(const QVector<QPoint> &values)
 {
     QVector<int> temps;
     QVector<int> fanSpeeds;
@@ -173,6 +177,18 @@ void Client::saveChartValues(const QVector<QPoint> &values)
         gpu_->setFanSpeeds(fanSpeeds);
         break;
     }
+}
+
+void Client::setCoolerBoost(const EnumerationStorage::CoolerBoost coolerBoost)
+{
+    coolerBoost_ = coolerBoost;
+    emit coolerBoostChanged();
+}
+
+void Client::setFanMode(const EnumerationStorage::FanMode fanMode)
+{
+    fanMode_ = fanMode;
+    emit fanModeChanged();
 }
 
 void Client::init()
@@ -227,6 +243,7 @@ void Client::startServer()
     {
         setServerState(ServerStates::Stopped);
         emit errorOccurred(serverLastError());
+        return;
     }
 
     return setServerState(ServerStates::Working);
@@ -249,8 +266,7 @@ void Client::updateFanMode()
         return;
     }
 
-    fanMode_ = value;
-    emit fanModeChanged();
+    setFanMode(value);
 
     return;
 }
@@ -272,8 +288,7 @@ void Client::updateCoolerBoost()
         return;
     }
 
-    coolerBoost_ = value;
-    emit coolerBoostChanged();
+    setCoolerBoost(value);
 
     return;
 }
@@ -345,7 +360,7 @@ void Client::setCpuTemps(const QVector<int> &temps)
 {
     if (cpu_->setTemps(temps) < 0)
     {
-        qDebug() << "can't set temps";
+        qDebug() << "ERROR: Can't set CPU temps";
     }
 }
 
@@ -353,7 +368,7 @@ void Client::setCpuFanSpeeds(const QVector<int> &fanSpeeds)
 {
     if (cpu_->setFanSpeeds(fanSpeeds) < 0)
     {
-        qDebug() << "can't set temps";
+        qDebug() << "ERROR: Can't set CPU fan speeds";
     }
 }
 
@@ -361,7 +376,7 @@ void Client::setGpuTemps(const QVector<int> &temps)
 {
     if (gpu_->setTemps(temps) < 0)
     {
-        qDebug() << "can't set temps";
+        qDebug() << "ERROR: Can't set GPU temps";
     }
 }
 
@@ -369,7 +384,7 @@ void Client::setGpuFanSpeeds(const QVector<int> &fanSpeeds)
 {
     if (gpu_->setFanSpeeds(fanSpeeds) < 0)
     {
-        qDebug() << "can't set temps";
+        qDebug() << "ERROR: Can't set GPU fan speeds";
     }
 }
 

@@ -30,7 +30,7 @@ class Client : public QObject
     Q_PROPERTY(mlfc::EnumerationStorage::ServerStates serverState READ serverState NOTIFY serverStateChanged)
     Q_PROPERTY(mlfc::EnumerationStorage::CoolerBoost coolerBoost READ coolerBoost NOTIFY coolerBoostChanged)
     Q_PROPERTY(mlfc::EnumerationStorage::FanMode fanMode READ fanMode NOTIFY fanModeChanged)
-    Q_PROPERTY(mlfc::EnumerationStorage::ChartValues chartValues READ chartValues WRITE setChartValues NOTIFY chartValuesChanged)
+    Q_PROPERTY(mlfc::EnumerationStorage::ChartValues chartValues READ chartValues WRITE onSetChartValuesClicked NOTIFY chartValuesChanged)
 public:
 
 
@@ -58,11 +58,11 @@ signals:
 public slots:
     void init();
 
-    void setCoollerBoost(const mlfc::EnumerationStorage::CoolerBoost coolerBoost);
-    void setFanMode(const mlfc::EnumerationStorage::FanMode fanMode);
-    void setChartValues(const mlfc::EnumerationStorage::ChartValues chartValues);
+    void onSetCoolerBoostClicked(const mlfc::EnumerationStorage::CoolerBoost coolerBoost);
+    void onSetFanModeClicked(const mlfc::EnumerationStorage::FanMode fanMode);
+    void onSetChartValuesClicked(const mlfc::EnumerationStorage::ChartValues chartValues);
 
-    void saveChartValues(const QVector<QPoint> &values);
+    void onSaveChartValuesClicked(const QVector<QPoint> &values);
 
 private:
     CPU *cpu_;
@@ -76,6 +76,9 @@ private:
     ChartValues chartValues_;
 
     QString lastError_;
+
+    void setCoolerBoost(const mlfc::EnumerationStorage::CoolerBoost coolerBoost);
+    void setFanMode(const mlfc::EnumerationStorage::FanMode fanMode);
 
     void setCpuTemp(int temp);
     void setCpuFanRmp(int rpm);
