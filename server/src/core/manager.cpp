@@ -3,10 +3,7 @@
 #include <fstream>
 #include <string.h>
 
-namespace mlfc
-{
-
-namespace core
+namespace mlfc::core
 {
 
 Manager::Manager() : Reader()
@@ -14,9 +11,9 @@ Manager::Manager() : Reader()
 
 }
 
-void Manager::SetCoolerBoost(enum CoolerBoost coolerboost)
+void Manager::setCoolerBoost(enum CoolerBoost coolerboost)
 {
-    if(this->CoolerBoost() == coolerboost)
+    if(this->coolerBoost() == coolerboost)
         return;
 
     try
@@ -49,9 +46,9 @@ void Manager::SetCoolerBoost(enum CoolerBoost coolerboost)
     }
 }
 
-void Manager::SetFanMode(enum FanMode fan_mode)
+void Manager::setFanMode(enum FanMode fan_mode)
 {
-    if(this->FanMode() == fan_mode)
+    if(this->fanMode() == fan_mode)
         return;
 
     try
@@ -100,6 +97,4 @@ void Manager::openFileRW(std::fstream &file)
     }
 }
 
-} // namespace core
-
-} // namespace mlfc
+} // namespace mlfc::core

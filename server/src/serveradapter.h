@@ -18,33 +18,33 @@ public:
     ServerAdapter(QObject *parent);
 
 signals:
-    void RealtimeCPUTemp(int temp);
-    void RealtimeCPUFanRPM(int rpm);
+    void realtimeCPUTemp(int temp);
+    void realtimeCPUFanRPM(int rpm);
 
-    void RealtimeGPUTemp(int temp);
-    void RealtimeGPUFanRPM(int rpm);
+    void realtimeGPUTemp(int temp);
+    void realtimeGPUFanRPM(int rpm);
 
-    void AnErrorOccured(QString error);
+    void anErrorOccured(QString error);
 
 public slots:
-    bool Start();
+    bool start();
 
-    core::FanMode FanMode();
-    core::CoolerBoost CoolerBoost();
+    core::FanMode fanMode();
+    core::CoolerBoost coolerBoost();
 
-    bool SetCoolerBoost(core::CoolerBoost cooler_boost);
-    bool SetFanMode(core::FanMode fan_mode);
+    bool setCoolerBoost(core::CoolerBoost cooler_boost);
+    bool setFanMode(core::FanMode fan_mode);
 
-    QVector<int> CPUTemps();
-    QVector<int> CPUFanSpeeds();
+    QVector<int> cpuTemps();
+    QVector<int> cpuFanSpeeds();
 
-    QVector<int> GPUTemps();
-    QVector<int> GPUFanSpeeds();
+    QVector<int> gpuTemps();
+    QVector<int> gpuFanSpeeds();
 
-    bool SetUpdateInterval(int interval);
-    int UpdateInterval() const;
+    bool setUpdateInterval(int interval);
+    int updateInterval() const;
 
-    QString last_error() const;
+    QString lastError() const;
 };
 
 } // namespace mlfc

@@ -3,10 +3,7 @@
 
 #include <array>
 
-namespace mlfc
-{
-
-namespace core
+namespace mlfc::core
 {
 
 #ifdef NDEBUG
@@ -65,8 +62,6 @@ enum class FanMode
 };
 
 
-} // namespace core
-
-} // namespace mlfc
+} // namespace mlfc::core
 
 #endif // CONSTANTS_H
