@@ -4,10 +4,7 @@
 #include "constants.h"
 #include "reader.h"
 
-namespace mlfc
-{
-
-namespace core
+namespace mlfc::core
 {
 
 class Manager : public Reader
@@ -16,15 +13,13 @@ public:
     Manager();
     ~Manager() = default;
 
-    void SetCoolerBoost(enum CoolerBoost coolerboost);
-    void SetFanMode(enum FanMode fan_mode);
+    void setCoolerBoost(enum CoolerBoost coolerboost);
+    void setFanMode(enum FanMode fan_mode);
 
 private:
     void openFileRW(std::fstream &file);
 };
 
-} // namespace core
-
-} // namespace mlfc
+} // namespace mlfc::core
 
 #endif // MANAGER_H

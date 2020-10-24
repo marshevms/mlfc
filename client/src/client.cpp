@@ -38,11 +38,11 @@ bool Client::start(CPU *cpu, GPU *gpu)
 
     server_ = new ServerInterface("com.github.mlfc.server", "/Server", QDBusConnection::systemBus(), this);
 
-    connect(server_, &ServerInterface::RealtimeCPUTemp, this, &Client::setCpuTemp);
-    connect(server_, &ServerInterface::RealtimeCPUFanRPM, this, &Client::setCpuFanRmp);
+    connect(server_, &ServerInterface::realtimeCPUTemp, this, &Client::setCpuTemp);
+    connect(server_, &ServerInterface::realtimeCPUFanRPM, this, &Client::setCpuFanRmp);
 
-    connect(server_, &ServerInterface::RealtimeGPUTemp, this, &Client::setGpuTemp);
-    connect(server_, &ServerInterface::RealtimeGPUFanRPM, this, &Client::setGpuFanRmp);
+    connect(server_, &ServerInterface::realtimeGPUTemp, this, &Client::setGpuTemp);
+    connect(server_, &ServerInterface::realtimeGPUFanRPM, this, &Client::setGpuFanRmp);
 
     init();
     return true;
