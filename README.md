@@ -5,19 +5,19 @@ I am not a designer, so do not expect much.
 
 The application is divided into two parts. Server and client.
 The server part must work with root privileges to read/write to the file.
-The server part only reads the data from the file, therefore, fan speed control at this stage is not available. The client part works like a regular application.
+The server part only reads the data from the file. The client part works like a regular application.
 Communication takes place using the dbus interface.
 
 ![Image of Client](doc/images/mlfc_client.png)
 
 ## Installation
 
-I am testing on Ubuntu 18.04
+I am testing on Ubuntu 20.04
 
 ### Dependencies
 
 1. C++17 compiler
-2. Qt, I am using 5.13.2
+2. Qt, I am using 5.15.1
 3. CMake
 
 ```modprobe ec_sys write_support=1```
