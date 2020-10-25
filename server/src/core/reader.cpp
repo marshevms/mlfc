@@ -5,10 +5,7 @@
 #include <string>
 #include <string.h>
 
-namespace mlfc
-{
-
-namespace core
+namespace mlfc::core
 {
 
 Reader::Reader()
@@ -30,7 +27,7 @@ Reader::~Reader()
 
 }
 
-int Reader::RealtimeCPUTemp()
+int Reader::realtimeCPUTemp()
 {
     try
     {
@@ -50,7 +47,7 @@ int Reader::RealtimeCPUTemp()
     }
 }
 
-int Reader::RealtimeCPUFanRPM()
+int Reader::realtimeCPUFanRPM()
 {
     try
     {
@@ -75,7 +72,7 @@ int Reader::RealtimeCPUFanRPM()
     }
 }
 
-std::vector<int> Reader::CPUTemps()
+std::vector<int> Reader::cpuTemps()
 {
     try
     {
@@ -103,7 +100,7 @@ std::vector<int> Reader::CPUTemps()
     }
 }
 
-std::vector<int> Reader::CPUFanSpeeds()
+std::vector<int> Reader::cpuFanSpeeds()
 {
     try
     {
@@ -131,7 +128,7 @@ std::vector<int> Reader::CPUFanSpeeds()
     }
 }
 
-int Reader::RealtimeGPUTemp()
+int Reader::realtimeGPUTemp()
 {
     try
     {
@@ -151,7 +148,7 @@ int Reader::RealtimeGPUTemp()
     }
 }
 
-int Reader::RealtimeGPUFanRPM()
+int Reader::realtimeGPUFanRPM()
 {
     try
     {
@@ -176,7 +173,7 @@ int Reader::RealtimeGPUFanRPM()
     }
 }
 
-std::vector<int> Reader::GPUTemps()
+std::vector<int> Reader::gpuTemps()
 {
     try
     {
@@ -204,7 +201,7 @@ std::vector<int> Reader::GPUTemps()
     }
 }
 
-std::vector<int> Reader::GPUFanSpeeds()
+std::vector<int> Reader::gpuFanSpeeds()
 {
     try
     {
@@ -232,7 +229,7 @@ std::vector<int> Reader::GPUFanSpeeds()
     }
 }
 
-FanMode Reader::FanMode()
+FanMode Reader::fanMode()
 {
     try
     {
@@ -264,7 +261,7 @@ FanMode Reader::FanMode()
     }
 }
 
-CoolerBoost Reader::CoolerBoost()
+CoolerBoost Reader::coolerBoost()
 {
     try
     {
@@ -289,6 +286,4 @@ CoolerBoost Reader::CoolerBoost()
     }
 }
 
-} // namespace core
-
-} // namespace mlfc
+} // namespace mlfc::core

@@ -1,9 +1,9 @@
 #ifndef UTILS_H
 #define UTILS_H
 
-#include <QDBusArgument>
-
 #include <type_traits>
+
+#include <QDBusArgument>
 
 template <typename T, typename TEnum>
 struct QDBusEnumMarshal;

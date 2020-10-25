@@ -8,16 +8,11 @@
 
 class QTimer;
 
-namespace mlfc
-{
-
-namespace core
+namespace mlfc::core
 {
 class Manager;
 enum class FanMode;
 enum class CoolerBoost;
-}
-
 }
 
 namespace mlfc
@@ -38,36 +33,42 @@ public:
     ~Server();
 
 
-    void set_last_error(const QString &error);
+    void setLastError(const QString &error);
 
 signals:
-    void RealtimeCPUTemp(int temp);
-    void RealtimeCPUFanRPM(int rpm);
+    void realtimeCPUTemp(int temp);
+    void realtimeCPUFanRPM(int rpm);
 
-    void RealtimeGPUTemp(int temp);
-    void RealtimeGPUFanRPM(int rpm);
+    void realtimeGPUTemp(int temp);
+    void realtimeGPUFanRPM(int rpm);
 
-    void AnErrorOccured(QString error);
+    void anErrorOccured(QString error);
 
 public slots:
-    bool Start();
+    bool start();
 
-    enum core::FanMode FanMode();
-    enum core::CoolerBoost CoolerBoost();
+    enum core::FanMode fanMode();
+    enum core::CoolerBoost coolerBoost();
 
-    bool SetCoolerBoost(core::CoolerBoost cooler_boost);
-    bool SetFanMode(core::FanMode fan_mode);
+    bool setCoolerBoost(core::CoolerBoost cooler_boost);
+    bool setFanMode(core::FanMode fan_mode);
 
-    QVector<int> CPUTemps();
-    QVector<int> CPUFanSpeeds();
+    QVector<int> cpuTemps();
+    QVector<int> cpuFanSpeeds();
 
-    QVector<int> GPUTemps();
-    QVector<int> GPUFanSpeeds();
+    QVector<int> gpuTemps();
+    QVector<int> gpuFanSpeeds();
 
-    bool SetUpdateInterval(int interval);
-    int UpdateInterval() const;
+    bool setCPUTemps(QVector<int> &cpuTemps);
+    bool setCPUFanSpeeds(QVector<int> &cpuFanSpeeds);
 
-    QString last_error() const;
+    bool setGPUTemps(QVector<int> &gpuTemps);
+    bool setGPUFanSpeeds(QVector<int> &gpuFanSpeeds);
+
+    bool setUpdateInterval(int interval);
+    int updateInterval() const;
+
+    QString lastError() const;
 
 private:
     static constexpr int kMinTimeoutSecs = 500;
@@ -81,7 +82,7 @@ private:
 
     QString last_error_;
 
-    void Update();
+    void update();
 
 };
 

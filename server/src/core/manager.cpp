@@ -2,11 +2,9 @@
 
 #include <fstream>
 #include <string.h>
+#include <sstream>
 
-namespace mlfc
-{
-
-namespace core
+namespace mlfc::core
 {
 
 Manager::Manager() : Reader()
@@ -14,9 +12,9 @@ Manager::Manager() : Reader()
 
 }
 
-void Manager::SetCoolerBoost(enum CoolerBoost coolerboost)
+void Manager::setCoolerBoost(enum CoolerBoost coolerboost)
 {
-    if(this->CoolerBoost() == coolerboost)
+    if(this->coolerBoost() == coolerboost)
         return;
 
     try
@@ -49,9 +47,9 @@ void Manager::SetCoolerBoost(enum CoolerBoost coolerboost)
     }
 }
 
-void Manager::SetFanMode(enum FanMode fan_mode)
+void Manager::setFanMode(enum FanMode fan_mode)
 {
-    if(this->FanMode() == fan_mode)
+    if(this->fanMode() == fan_mode)
         return;
 
     try
@@ -86,6 +84,182 @@ void Manager::SetFanMode(enum FanMode fan_mode)
     }
 }
 
+void Manager::setCPUTemps(const std::vector<int> &cpuTemps)
+{
+    if (this->fanMode() != FanMode::Advanced)
+    {
+        throw std::logic_error("Can't set cpu temps if fan mode is not 'Advanced'");
+    }
+
+    if (cpuTemps.size() != kTempsNumber)
+    {
+        std::ostringstream out;
+        out << "Size of cpu temps must be equeal " << kTempsNumber;
+        for(auto const & temp : cpuTemps)
+        {
+            out << temp << "  ";
+        }
+
+        throw std::logic_error(out.str());
+    }
+
+    if (!checkArrayValue(cpuTemps))
+    {
+        throw  std::logic_error("Wrong set of cpu temps");
+    }
+
+    try
+    {
+        std::fstream file;
+        openFileRW(file);
+
+        file.seekp(cpu::kTemps[0]);
+
+        for(auto const & temp : cpuTemps)
+        {
+            unsigned char data = temp;
+            file.write(reinterpret_cast<char*>(&data), sizeof (data));
+        }
+
+        file.close();
+
+    }
+    catch (std::ios_base::failure &e)
+    {
+        throw std::runtime_error(std::string(strerror(errno)));
+    }
+}
+
+void Manager::setCPUFanSpeeds(const std::vector<int> &cpuFanSpeeds)
+{
+    if (this->fanMode() != FanMode::Advanced)
+    {
+        throw std::logic_error("Can't set cpu fan speeds if fan mode is not 'Advanced'");
+    }
+
+    if (cpuFanSpeeds.size() != kFanSpeedsNumber)
+    {
+        std::ostringstream out;
+        out << "Size of cpu fan speeds must be equeal " << kFanSpeedsNumber;
+
+        throw std::logic_error(out.str());
+    }
+
+    if (!checkArrayValue(cpuFanSpeeds))
+    {
+        throw  std::logic_error("Wrong set of cpu fan speeds");
+    }
+
+    try
+    {
+        std::fstream file;
+        openFileRW(file);
+
+        file.seekp(cpu::kFanSpeeds[0]);
+
+        for(auto const & fanSpeed : cpuFanSpeeds)
+        {
+            unsigned char data = fanSpeed;
+            file.write(reinterpret_cast<char*>(&data), sizeof (data));
+        }
+
+        file.close();
+
+    }
+    catch (std::ios_base::failure &e)
+    {
+        throw std::runtime_error(std::string(strerror(errno)));
+    }
+}
+
+void Manager::setGPUTemps(const std::vector<int> &gpuTemps)
+{
+    if (this->fanMode() != FanMode::Advanced)
+    {
+        throw std::logic_error("Can't set gpu temps if fan mode is not 'Advanced'");
+    }
+
+    if (gpuTemps.size() != kTempsNumber)
+    {
+        std::ostringstream out;
+        out << "Size of gpu temps must be equeal " << kTempsNumber;
+        for(auto const & temp : gpuTemps)
+        {
+            out << temp << "  ";
+        }
+
+        throw std::logic_error(out.str());
+    }
+
+    if (!checkArrayValue(gpuTemps))
+    {
+        throw  std::logic_error("Wrong set of gpu temps");
+    }
+
+    try
+    {
+        std::fstream file;
+        openFileRW(file);
+
+        file.seekp(gpu::kTemps[0]);
+
+        for(auto const & temp : gpuTemps)
+        {
+            unsigned char data = temp;
+            file.write(reinterpret_cast<char*>(&data), sizeof (data));
+        }
+
+        file.close();
+
+    }
+    catch (std::ios_base::failure &e)
+    {
+        throw std::runtime_error(std::string(strerror(errno)));
+    }
+}
+
+void Manager::setGPUFanSpeeds(const std::vector<int> &gpuFanSpeeds)
+{
+    if (this->fanMode() != FanMode::Advanced)
+    {
+        throw std::logic_error("Can't set gpu fan speeds if fan mode is not 'Advanced'");
+    }
+
+    if (gpuFanSpeeds.size() != kFanSpeedsNumber)
+    {
+        std::ostringstream out;
+        out << "Size of gpu fan speeds must be equeal " << kFanSpeedsNumber;
+
+        throw std::logic_error(out.str());
+    }
+
+    if (!checkArrayValue(gpuFanSpeeds))
+    {
+        throw  std::logic_error("Wrong set of gpu fan speeds");
+    }
+
+    try
+    {
+        std::fstream file;
+        openFileRW(file);
+
+        file.seekp(gpu::kFanSpeeds[0]);
+
+        for(auto const & fanSpeed : gpuFanSpeeds)
+        {
+            unsigned char data = fanSpeed;
+            file.write(reinterpret_cast<char*>(&data), sizeof (data));
+        }
+
+        file.close();
+
+    }
+    catch (std::ios_base::failure &e)
+    {
+        throw std::runtime_error(std::string(strerror(errno)));
+    }
+}
+
 void Manager::openFileRW(std::fstream &file)
 {
     file.exceptions(std::fstream::failbit);
@@ -100,6 +274,18 @@ void Manager::openFileRW(std::fstream &file)
     }
 }
 
-} // namespace core
+bool Manager::checkArrayValue(const std::vector<int> &values)
+{
+    int oldValue = 0;
+    for(auto const & value : values)
+    {
+        if (value < oldValue || value > 100)
+            return false;
 
-} // namespace mlfc
+        oldValue = value;
+    }
+
+    return true;
+}
+
+} // namespace mlfc::core

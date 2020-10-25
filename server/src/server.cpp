@@ -22,9 +22,9 @@ Server::~Server()
 
 }
 
-bool Server::Start()
+bool Server::start()
 {
-    connect(timer_, &QTimer::timeout, this, &Server::Update);
+    connect(timer_, &QTimer::timeout, this, &Server::update);
 
     try
     {
@@ -32,7 +32,7 @@ bool Server::Start()
     }
     catch (std::runtime_error &e)
     {
-        set_last_error(e.what());
+        setLastError(e.what());
         return false;
     }
 
@@ -43,179 +43,291 @@ bool Server::Start()
     return true;
 }
 
-core::FanMode Server::FanMode()
+core::FanMode Server::fanMode()
 {
     if(server_status_ == ServerStatus::kOFF)
     {
-        set_last_error({"Server is not started yet"});
+        setLastError({"Server is not started yet"});
         return core::FanMode::Unknown;
     }
 
     try
     {
-        return manager_->FanMode();
+        return manager_->fanMode();
     }
     catch (std::runtime_error &e)
     {
-        set_last_error(e.what());
-        emit AnErrorOccured(last_error());
+        setLastError(e.what());
+        emit anErrorOccured(lastError());
     }
 
     return core::FanMode::Unknown;
 }
 
-core::CoolerBoost Server::CoolerBoost()
+core::CoolerBoost Server::coolerBoost()
 {
     if(server_status_ == ServerStatus::kOFF)
     {
-        set_last_error({"Server is not started yet"});
+        setLastError({"Server is not started yet"});
         return core::CoolerBoost::Unknown;
     }
 
     try
     {
-        return manager_->CoolerBoost();
+        return manager_->coolerBoost();
     }
     catch (std::runtime_error &e)
     {
-        set_last_error(e.what());
-        emit AnErrorOccured(last_error());
+        setLastError(e.what());
+        emit anErrorOccured(lastError());
     }
 
     return core::CoolerBoost::Unknown;
 }
 
-bool Server::SetCoolerBoost(core::CoolerBoost cooler_boost)
+bool Server::setCoolerBoost(core::CoolerBoost cooler_boost)
 {
     if(server_status_ == ServerStatus::kOFF)
     {
-        set_last_error({"Server is not started yet"});
+        setLastError({"Server is not started yet"});
         return false;
     }
 
     try
     {
-        manager_->SetCoolerBoost(cooler_boost);
+        manager_->setCoolerBoost(cooler_boost);
 
         return true;
     }
     catch (std::runtime_error &e)
     {
-        set_last_error(e.what());
-        emit AnErrorOccured(last_error());
+        setLastError(e.what());
+        emit anErrorOccured(lastError());
     }
 
     return false;
 }
 
-bool Server::SetFanMode(core::FanMode fan_mode)
+bool Server::setFanMode(core::FanMode fan_mode)
 {
     if(server_status_ == ServerStatus::kOFF)
     {
-        set_last_error({"Server is not started yet"});
+        setLastError({"Server is not started yet"});
         return false;
     }
 
     try
     {
-        manager_->SetFanMode(fan_mode);
+        manager_->setFanMode(fan_mode);
 
         return true;
     }
     catch (std::runtime_error &e)
     {
-        set_last_error(e.what());
-        emit AnErrorOccured(last_error());
+        setLastError(e.what());
+        emit anErrorOccured(lastError());
     }
 
     return false;
 }
 
-QVector<int> Server::CPUTemps()
+QVector<int> Server::cpuTemps()
 {
     if(server_status_ == ServerStatus::kOFF)
     {
-        set_last_error({"Server is not started yet"});
+        setLastError({"Server is not started yet"});
         return {};
     }
 
     try
     {
-        return QVector<int>::fromStdVector(manager_->CPUTemps());
+        auto cpuTemps = manager_->cpuTemps();
+        return QVector<int>(cpuTemps.begin(), cpuTemps.end());
     }
     catch (std::runtime_error &e)
     {
-        set_last_error(e.what());
-        emit AnErrorOccured(last_error());
+        setLastError(e.what());
+        emit anErrorOccured(lastError());
     }
 
     return {};
 }
 
-QVector<int> Server::CPUFanSpeeds()
+QVector<int> Server::cpuFanSpeeds()
 {
     if(server_status_ == ServerStatus::kOFF)
     {
-        set_last_error({"Server is not started yet"});
+        setLastError({"Server is not started yet"});
         return {};
     }
 
     try
     {
-        return QVector<int>::fromStdVector(manager_->CPUFanSpeeds());
+        auto cpuFanSpeeds = manager_->cpuFanSpeeds();
+        return QVector<int>(cpuFanSpeeds.begin(), cpuFanSpeeds.end());
     }
     catch (std::runtime_error &e)
     {
-        set_last_error(e.what());
-        emit AnErrorOccured(last_error());
+        setLastError(e.what());
+        emit anErrorOccured(lastError());
     }
 
     return {};
 }
 
-QVector<int> Server::GPUTemps()
+QVector<int> Server::gpuTemps()
 {
     if(server_status_ == ServerStatus::kOFF)
     {
-        set_last_error({"Server is not started yet"});
+        setLastError({"Server is not started yet"});
         return {};
     }
 
     try
     {
-        return QVector<int>::fromStdVector(manager_->GPUTemps());
+        auto gpuTemps = manager_->gpuTemps();
+        return QVector<int>(gpuTemps.begin(), gpuTemps.end());
     }
     catch (std::runtime_error &e)
     {
-        set_last_error(e.what());
-        emit AnErrorOccured(last_error());
+        setLastError(e.what());
+        emit anErrorOccured(lastError());
     }
 
     return {};
 }
 
-QVector<int> Server::GPUFanSpeeds()
+QVector<int> Server::gpuFanSpeeds()
 {
     if(server_status_ == ServerStatus::kOFF)
     {
-        set_last_error({"Server is not started yet"});
+        setLastError({"Server is not started yet"});
         return {};
     }
 
     try
     {
-        return QVector<int>::fromStdVector(manager_->GPUFanSpeeds());
+        auto fanSpeeds = manager_->gpuFanSpeeds();
+        return QVector<int>(fanSpeeds.begin(), fanSpeeds.end());
     }
     catch (std::runtime_error &e)
     {
-        set_last_error(e.what());
-        emit AnErrorOccured(last_error());
+        setLastError(e.what());
+        emit anErrorOccured(lastError());
     }
 
     return {};
 }
 
-bool Server::SetUpdateInterval(int interval)
+bool Server::setCPUTemps(QVector<int> &cpuTemps)
+{
+    if(server_status_ == ServerStatus::kOFF)
+    {
+        setLastError({"Server is not started yet"});
+        return false;
+    }
+
+    try
+    {
+        manager_->setCPUTemps({cpuTemps.begin(), cpuTemps.end()});
+        return true;
+    }
+    catch (std::logic_error &e)
+    {
+        setLastError(e.what());
+        emit anErrorOccured(lastError());
+    }
+    catch (std::runtime_error &e)
+    {
+        setLastError(e.what());
+        emit anErrorOccured(lastError());
+    }
+
+    return false;
+}
+
+bool Server::setCPUFanSpeeds(QVector<int> &cpuFanSpeeds)
+{
+    if(server_status_ == ServerStatus::kOFF)
+    {
+        setLastError({"Server is not started yet"});
+        return false;
+    }
+
+    try
+    {
+        manager_->setCPUFanSpeeds({cpuFanSpeeds.begin(), cpuFanSpeeds.end()});
+        return true;
+    }
+    catch (std::logic_error &e)
+    {
+        setLastError(e.what());
+        emit anErrorOccured(lastError());
+    }
+    catch (std::runtime_error &e)
+    {
+        setLastError(e.what());
+        emit anErrorOccured(lastError());
+    }
+
+    return false;
+}
+
+bool Server::setGPUTemps(QVector<int> &gpuTemps)
+{
+    if(server_status_ == ServerStatus::kOFF)
+    {
+        setLastError({"Server is not started yet"});
+        return false;
+    }
+
+    try
+    {
+        manager_->setGPUTemps({gpuTemps.begin(), gpuTemps.end()});
+        return true;
+    }
+    catch (std::logic_error &e)
+    {
+        setLastError(e.what());
+        emit anErrorOccured(lastError());
+    }
+    catch (std::runtime_error &e)
+    {
+        setLastError(e.what());
+        emit anErrorOccured(lastError());
+    }
+
+    return false;
+}
+
+bool Server::setGPUFanSpeeds(QVector<int> &gpuFanSpeeds)
+{
+    if(server_status_ == ServerStatus::kOFF)
+    {
+        setLastError({"Server is not started yet"});
+        return false;
+    }
+
+    try
+    {
+        manager_->setGPUFanSpeeds({gpuFanSpeeds.begin(), gpuFanSpeeds.end()});
+        return true;
+    }
+    catch (std::logic_error &e)
+    {
+        setLastError(e.what());
+        emit anErrorOccured(lastError());
+    }
+    catch (std::runtime_error &e)
+    {
+        setLastError(e.what());
+        emit anErrorOccured(lastError());
+    }
+
+    return false;
+}
+
+bool Server::setUpdateInterval(int interval)
 {
     if(interval < kMinTimeoutSecs && interval > kMaxTimeoutSecs)
         return false;
@@ -225,35 +337,35 @@ bool Server::SetUpdateInterval(int interval)
     return true;
 }
 
-int Server::UpdateInterval() const
+int Server::updateInterval() const
 {
     return timer_->interval();
 }
 
-QString Server::last_error() const
+QString Server::lastError() const
 {
     return last_error_;
 }
 
-void Server::set_last_error(const QString &error)
+void Server::setLastError(const QString &error)
 {
     last_error_ = error;
 }
 
-void Server::Update()
+void Server::update()
 {
     try
     {
-        emit RealtimeCPUTemp(manager_->RealtimeCPUTemp());
-        emit RealtimeCPUFanRPM(manager_->RealtimeCPUFanRPM());
+        emit realtimeCPUTemp(manager_->realtimeCPUTemp());
+        emit realtimeCPUFanRPM(manager_->realtimeCPUFanRPM());
 
-        emit RealtimeGPUTemp(manager_->RealtimeGPUTemp());
-        emit RealtimeGPUFanRPM(manager_->RealtimeGPUFanRPM());
+        emit realtimeGPUTemp(manager_->realtimeGPUTemp());
+        emit realtimeGPUFanRPM(manager_->realtimeGPUFanRPM());
     }
     catch (std::runtime_error &e)
     {
-        set_last_error(e.what());
-        emit AnErrorOccured(last_error());
+        setLastError(e.what());
+        emit anErrorOccured(lastError());
     }
 }
 

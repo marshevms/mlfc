@@ -6,10 +6,7 @@
 
 #include "constants.h"
 
-namespace mlfc
-{
-
-namespace core
+namespace mlfc::core
 {
 
 class Reader
@@ -19,27 +16,25 @@ public:
     ~Reader();
 
     //CPU
-    int RealtimeCPUTemp();
-    int RealtimeCPUFanRPM();
-    std::vector<int> CPUTemps();
-    std::vector<int> CPUFanSpeeds();
+    int realtimeCPUTemp();
+    int realtimeCPUFanRPM();
+    std::vector<int> cpuTemps();
+    std::vector<int> cpuFanSpeeds();
 
     //GPU
-    int RealtimeGPUTemp();
-    int RealtimeGPUFanRPM();
-    std::vector<int> GPUTemps();
-    std::vector<int> GPUFanSpeeds();
+    int realtimeGPUTemp();
+    int realtimeGPUFanRPM();
+    std::vector<int> gpuTemps();
+    std::vector<int> gpuFanSpeeds();
 
-    enum FanMode FanMode();
-    enum CoolerBoost CoolerBoost();
+    enum FanMode fanMode();
+    enum CoolerBoost coolerBoost();
 
 private:
     std::fstream file_;
 };
 
-} // namespace core
-
-} // namespace mlfc
+} // namespace mlfc::core
 
 
 #endif // READER_H
