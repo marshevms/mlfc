@@ -59,6 +59,12 @@ public slots:
     QVector<int> gpuTemps();
     QVector<int> gpuFanSpeeds();
 
+    bool setCPUTemps(QVector<int> &cpuTemps);
+    bool setCPUFanSpeeds(QVector<int> &cpuFanSpeeds);
+
+    bool setGPUTemps(QVector<int> &gpuTemps);
+    bool setGPUFanSpeeds(QVector<int> &gpuFanSpeeds);
+
     bool setUpdateInterval(int interval);
     int updateInterval() const;
 
