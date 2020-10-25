@@ -219,6 +219,114 @@ QVector<int> Server::gpuFanSpeeds()
     return {};
 }
 
+bool Server::setCPUTemps(QVector<int> &cpuTemps)
+{
+    if(server_status_ == ServerStatus::kOFF)
+    {
+        setLastError({"Server is not started yet"});
+        return false;
+    }
+
+    try
+    {
+        manager_->setCPUTemps({cpuTemps.begin(), cpuTemps.end()});
+        return true;
+    }
+    catch (std::logic_error &e)
+    {
+        setLastError(e.what());
+        emit anErrorOccured(lastError());
+    }
+    catch (std::runtime_error &e)
+    {
+        setLastError(e.what());
+        emit anErrorOccured(lastError());
+    }
+
+    return false;
+}
+
+bool Server::setCPUFanSpeeds(QVector<int> &cpuFanSpeeds)
+{
+    if(server_status_ == ServerStatus::kOFF)
+    {
+        setLastError({"Server is not started yet"});
+        return false;
+    }
+
+    try
+    {
+        manager_->setCPUFanSpeeds({cpuFanSpeeds.begin(), cpuFanSpeeds.end()});
+        return true;
+    }
+    catch (std::logic_error &e)
+    {
+        setLastError(e.what());
+        emit anErrorOccured(lastError());
+    }
+    catch (std::runtime_error &e)
+    {
+        setLastError(e.what());
+        emit anErrorOccured(lastError());
+    }
+
+    return false;
+}
+
+bool Server::setGPUTemps(QVector<int> &gpuTemps)
+{
+    if(server_status_ == ServerStatus::kOFF)
+    {
+        setLastError({"Server is not started yet"});
+        return false;
+    }
+
+    try
+    {
+        manager_->setGPUTemps({gpuTemps.begin(), gpuTemps.end()});
+        return true;
+    }
+    catch (std::logic_error &e)
+    {
+        setLastError(e.what());
+        emit anErrorOccured(lastError());
+    }
+    catch (std::runtime_error &e)
+    {
+        setLastError(e.what());
+        emit anErrorOccured(lastError());
+    }
+
+    return false;
+}
+
+bool Server::setGPUFanSpeeds(QVector<int> &gpuFanSpeeds)
+{
+    if(server_status_ == ServerStatus::kOFF)
+    {
+        setLastError({"Server is not started yet"});
+        return false;
+    }
+
+    try
+    {
+        manager_->setGPUFanSpeeds({gpuFanSpeeds.begin(), gpuFanSpeeds.end()});
+        return true;
+    }
+    catch (std::logic_error &e)
+    {
+        setLastError(e.what());
+        emit anErrorOccured(lastError());
+    }
+    catch (std::runtime_error &e)
+    {
+        setLastError(e.what());
+        emit anErrorOccured(lastError());
+    }
+
+    return false;
+}
+
 bool Server::setUpdateInterval(int interval)
 {
     if(interval < kMinTimeoutSecs && interval > kMaxTimeoutSecs)

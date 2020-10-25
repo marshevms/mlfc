@@ -56,6 +56,26 @@ QVector<int> ServerAdapter::gpuFanSpeeds()
     return reinterpret_cast<mlfc::Server*>(this->parent())->gpuFanSpeeds();
 }
 
+bool ServerAdapter::setCPUTemps(QVector<int> cpuTemps)
+{
+    return reinterpret_cast<mlfc::Server*>(this->parent())->setCPUTemps(cpuTemps);
+}
+
+bool ServerAdapter::setCPUFanSpeeds(QVector<int> cpuFanSpeeds)
+{
+    return reinterpret_cast<mlfc::Server*>(this->parent())->setCPUFanSpeeds(cpuFanSpeeds);
+}
+
+bool ServerAdapter::setGPUTemps(QVector<int> gpuTemps)
+{
+    return reinterpret_cast<mlfc::Server*>(this->parent())->setGPUTemps(gpuTemps);
+}
+
+bool ServerAdapter::setGPUFanSpeeds(QVector<int> gpuFanSpeeds)
+{
+    return reinterpret_cast<mlfc::Server*>(this->parent())->setGPUFanSpeeds(gpuFanSpeeds);
+}
+
 
 bool ServerAdapter::setUpdateInterval(int interval)
 {
