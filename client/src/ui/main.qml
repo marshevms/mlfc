@@ -317,6 +317,7 @@ ApplicationWindow{
                 }
 
                 onReleased: {
+                    scattersSeries.pointLabelsVisible = false
                     chartView.deSelect()
                 }
 

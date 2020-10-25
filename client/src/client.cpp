@@ -165,17 +165,84 @@ void Client::onSaveChartValuesClicked(const QVector<QPoint> &values)
         return point.y();
     });
 
-    switch (chartValues_) {
+    switch (chartValues_)
+    {
     case ChartValues::CPU:
+    {
         qDebug() << "INFO: Trying to change cpu values";
+
+        auto resTemps = server_->setCPUTemps(temps);
+        auto resFanSpeeds = server_->setCPUFanSpeeds(fanSpeeds);
+
         cpu_->setTemps(temps);
         cpu_->setFanSpeeds(fanSpeeds);
+
+        auto value = resTemps.value();
+        if(resTemps.isError())
+        {
+            emit errorOccurred(resTemps.error().message());
+            return;
+        }
+
+        if(!value)
+        {
+            emit errorOccurred(serverLastError());
+            return;
+        }
+
+        value = resFanSpeeds.value();
+        if(resFanSpeeds.isError())
+        {
+            emit errorOccurred(resFanSpeeds.error().message());
+            return;
+        }
+
+        if(!value)
+        {
+            emit errorOccurred(serverLastError());
+            return;
+        }
+
         break;
+    }
     case ChartValues::GPU:
+    {
         qDebug() << "INFO: Trying to change gpu values";
+
+        auto resTemps = server_->setGPUTemps(temps);
+        auto resFanSpeeds = server_->setGPUFanSpeeds(fanSpeeds);
+
         gpu_->setTemps(temps);
         gpu_->setFanSpeeds(fanSpeeds);
+
+        auto value = resTemps.value();
+        if(resTemps.isError())
+        {
+            emit errorOccurred(resTemps.error().message());
+            return;
+        }
+
+        if(!value)
+        {
+            emit errorOccurred(serverLastError());
+            return;
+        }
+
+        value = resFanSpeeds.value();
+        if(resFanSpeeds.isError())
+        {
+            emit errorOccurred(resFanSpeeds.error().message());
+            return;
+        }
+
+        if(!value)
+        {
+            emit errorOccurred(serverLastError());
+            return;
+        }
+
         break;
+    }
     }
 }
 

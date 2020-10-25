@@ -49,6 +49,34 @@ public Q_SLOTS: // METHODS
         return asyncCallWithArgumentList(QStringLiteral("setFanMode"), argumentList);
     }
 
+    inline QDBusPendingReply<bool> setCPUTemps(const QVector<int> &setCPUTemps)
+    {
+        QList<QVariant> argumentList;
+        argumentList << QVariant::fromValue(setCPUTemps);
+        return asyncCallWithArgumentList(QStringLiteral("setCPUTemps"), argumentList);
+    }
+
+    inline QDBusPendingReply<bool> setCPUFanSpeeds(const QVector<int> &setCPUFanSpeeds)
+    {
+        QList<QVariant> argumentList;
+        argumentList << QVariant::fromValue(setCPUFanSpeeds);
+        return asyncCallWithArgumentList(QStringLiteral("setCPUFanSpeeds"), argumentList);
+    }
+
+    inline QDBusPendingReply<bool> setGPUTemps(const QVector<int> &setCPUTemps)
+    {
+        QList<QVariant> argumentList;
+        argumentList << QVariant::fromValue(setCPUTemps);
+        return asyncCallWithArgumentList(QStringLiteral("setGPUTemps"), argumentList);
+    }
+
+    inline QDBusPendingReply<bool> setGPUFanSpeeds(const QVector<int> &setCPUFanSpeeds)
+    {
+        QList<QVariant> argumentList;
+        argumentList << QVariant::fromValue(setCPUFanSpeeds);
+        return asyncCallWithArgumentList(QStringLiteral("setGPUFanSpeeds"), argumentList);
+    }
+
     inline QDBusPendingReply<bool> setUpdateInterval(int interval)
     {
         QList<QVariant> argumentList;
