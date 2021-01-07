@@ -1,3 +1,11 @@
 #Cmake
 CMakeLists.txt.user
 CMakeCache.txt
+
+#Ignor hiden folders
+.vscode
+.idea
+.kdev4
+
+#build
+.build
