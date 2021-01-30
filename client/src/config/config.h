@@ -44,8 +44,7 @@ public:
     void setFilePath(const std::string &filePath);
     std::string getFilePath() const;
 
-    QString lastError() const;
-
+    std::string lastError() const;
 
 private:
 
