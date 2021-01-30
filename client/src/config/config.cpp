@@ -15,7 +15,6 @@ Config::Config()
     : filePath_("mlfc.toml")
     , auto_(nullptr)
     , advanced_(nullptr)
-    , currentMode_(nullptr)
 {}
 
 Config::Config(const std::string &path)
@@ -183,12 +182,11 @@ std::string Config::getFilePath() const
     return filePath_;
 }
 
-
 std::string Config::lastError() const
 {
     return lastError_;
 }
-
+  
 void Config::setFilePath(const std::string &filePath)
 {
     filePath_ = filePath;

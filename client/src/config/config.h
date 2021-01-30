@@ -46,7 +46,6 @@ public:
 
     std::string lastError() const;
 
-
 private:
 
     static constexpr std::string_view modeSTR_         {"mode"};
