@@ -22,7 +22,6 @@ Config::Config(const std::string &path)
     : filePath_(path)
     , auto_(nullptr)
     , advanced_(nullptr)
-    , currentMode_(nullptr)
 {}
 
 bool Config::read()
@@ -183,6 +182,7 @@ std::string Config::getFilePath() const
 {
     return filePath_;
 }
+
 
 std::string Config::lastError() const
 {
