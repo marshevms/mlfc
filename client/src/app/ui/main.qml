@@ -8,7 +8,6 @@ import QtCharts 2.3
 import EnumerationStorage 1.0
 import FanModeModel 1.0
 
-
 ApplicationWindow{
     id: window
     height: 540
@@ -232,17 +231,11 @@ ApplicationWindow{
             Layout.columnSpan: 3
 
             enabled: {
-                if (editOrSaveChartBtn.currentState === editOrSaveChartBtn.editingState){
+                if (editOrSaveChartBtn.currentState === editOrSaveChartBtn.editingState && client.fanMode === EnumerationStorage.FanMode.Advanced){
                     graphControl.getScatterSeries().color = "#99ca53"
                     graphControl.getLineSeries().color = "#209fdf"
-                }else{
-                    graphControl.getScatterSeries().color = "gray"
-                    graphControl.getLineSeries().color = "gray"
-                    graphControl.updateGraph()
-                }
-                if (client.fanMode === EnumerationStorage.FanMode.Advanced){
                     return true
-                } else{
+                }else{
                     graphControl.getScatterSeries().color = "gray"
                     graphControl.getLineSeries().color = "gray"
                     graphControl.updateGraph()
@@ -306,7 +299,7 @@ ApplicationWindow{
                 property bool savedState: true
                 property bool currentState: savedState
 
-                enabled: graphControl.enabled
+                enabled: client.fanMode === EnumerationStorage.FanMode.Advanced
 
                 text: {
                     if (currentState == savedState){
