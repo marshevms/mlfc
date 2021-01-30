@@ -13,10 +13,15 @@ namespace mlfc::config
 
 Config::Config()
     : filePath_("mlfc.toml")
+    , auto_(nullptr)
+    , advanced_(nullptr)
+    , currentMode_(nullptr)
 {}
 
 Config::Config(const std::string &path)
     : filePath_(path)
+    , auto_(nullptr)
+    , advanced_(nullptr)
 {}
 
 bool Config::read()
@@ -176,6 +181,12 @@ Config::Vector Config::getGpuFanSpeeds(const Config::FanMode mode, const std::st
 std::string Config::getFilePath() const
 {
     return filePath_;
+}
+
+
+std::string Config::lastError() const
+{
+    return lastError_;
 }
 
 void Config::setFilePath(const std::string &filePath)
