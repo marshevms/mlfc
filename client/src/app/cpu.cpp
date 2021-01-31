@@ -57,7 +57,12 @@ int CPU::setTemps(const QVector<int> &temps)
     return 0;
 }
 
-QVector<int> CPU::temps()
+QVector<int> CPU::temps() const
+{
+    return temps_;
+}
+
+const QVector<int> &CPU::rTemps() const
 {
     return temps_;
 }
@@ -79,7 +84,12 @@ int CPU::setFanSpeeds(const QVector<int> &fanSpeeds)
     return 0;
 }
 
-QVector<int> CPU::fanSpeeds()
+QVector<int> CPU::fanSpeeds() const
+{
+    return fanSpeeds_;
+}
+
+const QVector<int> &CPU::rFanSpeeds() const
 {
     return fanSpeeds_;
 }

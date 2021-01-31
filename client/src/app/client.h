@@ -6,12 +6,21 @@
 
 #include "serverinterface.h"
 #include "enumerationstorage.h"
+#include "model/model.h"
+#include "model/qmltempsfanspeeds.h"
 
 namespace mlfc
 {
 
 class CPU;
 class GPU;
+
+namespace config
+{
+
+class Config;
+
+}
 
 }
 
@@ -20,6 +29,10 @@ namespace mlfc
 
 class Client : public QObject
 {
+    using Config = config::Config;
+    using CpuGpu = model::CpuGpu;
+    using QmlTempsFanSpeeds = model::qmlTempsFanSpeeds;
+
     using FanMode = mlfc::EnumerationStorage::FanMode;
     using ServerStates = mlfc::EnumerationStorage::ServerStates;
     using CoolerBoost = mlfc::EnumerationStorage::CoolerBoost;
@@ -62,11 +75,13 @@ public slots:
     void onSetFanModeClicked(const mlfc::EnumerationStorage::FanMode fanMode);
     void onSetChartValuesClicked(const mlfc::EnumerationStorage::ChartValues chartValues);
 
-    void onSaveChartValuesClicked(const QVector<QPoint> &values);
+    void onSaveChartValuesClicked(const mlfc::model::qmlTempsFanSpeeds *tempsFanSpeeds, const mlfc::EnumerationStorage::ChartValues pu);
 
 private:
     CPU *cpu_;
     GPU *gpu_;
+
+    Config *config_;
 
     ServerInterface *server_;
 
@@ -106,6 +121,20 @@ private:
     void updateGpuFanSpeeds();
 
     void setServerState(const mlfc::EnumerationStorage::ServerStates state);
+
+    //Config
+    void readConfig();
+    void saveConfig();
+
+    CpuGpu getConfigValues(const FanMode mode, const QString &preset = "");
+    bool setConfigValues(const CpuGpu &pair, const FanMode mode, const QString &preset = "");
+
+    FanMode getConfigMode();
+    bool setConfigMode(const FanMode mode);
+
+    void initConfig();
+    void checkConfig();
+    void cmpAndChange(CpuGpu &pair);
 
 };
 
