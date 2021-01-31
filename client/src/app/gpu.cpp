@@ -57,7 +57,12 @@ int GPU::setTemps(const QVector<int> &temps)
     return 0;
 }
 
-QVector<int> GPU::temps()
+QVector<int> GPU::temps() const
+{
+    return temps_;
+}
+
+const QVector<int> &GPU::rTemps() const
 {
     return temps_;
 }
@@ -79,7 +84,12 @@ int GPU::setFanSpeeds(const QVector<int> &fanSpeeds)
     return 0;
 }
 
-QVector<int> GPU::fanSpeeds()
+QVector<int> GPU::fanSpeeds() const
+{
+    return fanSpeeds_;
+}
+
+const QVector<int> &GPU::rFanSpeeds() const
 {
     return fanSpeeds_;
 }

@@ -23,11 +23,12 @@ public:
     int fanRpm() const;
 
     int setTemps(const QVector<int> &temps);
-    QVector<int> temps();
+    QVector<int> temps() const;
+    const QVector<int> &rTemps() const;
 
     int setFanSpeeds(const QVector<int> &fanSpeeds);
-    QVector<int> fanSpeeds();
-
+    QVector<int> fanSpeeds() const;
+    const QVector<int> &rFanSpeeds() const;
 
 signals:
     void tempChanged();
