@@ -4,7 +4,7 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
-find_package(Qt5 COMPONENTS Widgets Core DBus Quick REQUIRED)
+find_package(Qt5 COMPONENTS Widgets Core DBus Quick Charts REQUIRED)
 find_package(Qt5QuickCompiler)
 
 set(mlfc_headers
@@ -12,6 +12,8 @@ set(mlfc_headers
     gpu.h
     client.h
     fanmodemodel.h
+    model/model.h
+    model/qmltempsfanspeeds.h
 )
 
 set(mlfc_sources
@@ -20,8 +22,9 @@ set(mlfc_sources
     gpu.cpp
     client.cpp
     fanmodemodel.cpp
+    model/model.cpp
+    model/qmltempsfanspeeds.cpp
 )
-# include_directories(${CMAKE_SOURCE_DIR}/server/src/utils)
 
 # #====================DBus==================================
 # include_directories(${CMAKE_CURRENT_BINARY_DIR})
@@ -49,8 +52,10 @@ target_link_libraries(
     Qt5::Core
     Qt5::DBus
     Qt5::Quick
+    Qt5::Charts
 
     ${CMAKE_PROJECT_NAME}_client_constants
     ${CMAKE_PROJECT_NAME}_server_interface
+    ${CMAKE_PROJECT_NAME}_config
 )
 

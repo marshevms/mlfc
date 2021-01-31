@@ -312,13 +312,17 @@ ApplicationWindow{
                 onClicked: {
                     if (currentState == editingState)
                     {
+                        // I Hate Qml
+                        // Why I can't just pass qml ScatterSeries to C++ layer
                         let values = []
                         for (let i = 0; i < graphControl.getScatterSeries().count; ++i){
                             values.push(graphControl.getScatterSeries().at(i))
                         }
 
+                        tempsFanSpeeds.setTempsFanSpeeds(values)
+
                         console.log("INFO: ", values)
-                        client.onSaveChartValuesClicked(values)
+                        client.onSaveChartValuesClicked(tempsFanSpeeds, client.chartValues)
                     }
 
                     currentState = !currentState
