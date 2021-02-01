@@ -603,7 +603,7 @@ void Client::cmpAndChange(Client::CpuGpu &pair)
          if (!pair.gpu.isEqual(gpuPair))
          {
              tempsFanSpeeds->tempsFanSpeeds = std::move(pair.gpu);
-             onSaveChartValuesClicked(tempsFanSpeeds.get(),  ChartValues::CPU);
+             onSaveChartValuesClicked(tempsFanSpeeds.get(),  ChartValues::GPU);
          }
      }
 }
