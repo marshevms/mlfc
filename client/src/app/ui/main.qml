@@ -1,6 +1,8 @@
+import Qt.labs.platform 1.1 as Labs
+
 import QtQuick 2.12
-import QtQuick.Controls 2.12
-import QtQuick.Dialogs 1.2
+import QtQuick.Controls 2.15
+import QtQuick.Dialogs 1.3
 import QtQuick.Layouts 1.12
 import QtQuick.Controls.Styles 1.4
 import QtCharts 2.3
@@ -18,6 +20,10 @@ ApplicationWindow{
 
     title: qsTr("MSI Laptop Fan Control")
     visible: true
+
+    onClosing: {
+        window.hide()
+    }
 
     Connections
     {
@@ -218,7 +224,7 @@ ApplicationWindow{
                 }
             }
             onReleased: {
-               client.onSetCoolerBoostClicked(coolerBoost.checked? EnumerationStorage.CoolerBoost.ON : EnumerationStorage.CoolerBoost.OFF)
+                client.onSetCoolerBoostClicked(coolerBoost.checked? EnumerationStorage.CoolerBoost.ON : EnumerationStorage.CoolerBoost.OFF)
             }
         }
 
@@ -363,6 +369,50 @@ ApplicationWindow{
                 }
             }
             onClicked: client.init()
+        }
+    }
+
+    Labs.SystemTrayIcon{
+        visible: true
+        tooltip: qsTr("MSi Laptop Fan Control")
+        icon.source: "qrc:/icons/tray/fan.svg"
+
+        menu: Labs.Menu{
+            id: trayMenu
+
+            Labs.MenuItem {
+                text: qsTr("Open")
+                onTriggered: {
+                    window.show()
+                    window.raise()
+                    window.requestActivate()
+                }
+            }
+
+            Labs.MenuSeparator{}
+
+            Labs.MenuItem {
+                text: qsTr("Quit")
+                onTriggered: Qt.quit()
+            }
+        }
+
+        onActivated: {
+            console.log(reason)
+            console.log(window.visible, window.active)
+            switch (reason){
+            case Labs.SystemTrayIcon.Trigger:
+                if (window.visible && window.active){
+                    window.hide()
+                } else if (window.visible && !window.active){
+                    window.raise()
+                    window.requestActivate()
+                } else if ((!window.visible && !window.active) || !window.visible){
+                    window.show()
+                    window.raise()
+                    window.requestActivate()
+                }
+            }
         }
     }
 }
