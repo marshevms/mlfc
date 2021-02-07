@@ -18,7 +18,7 @@ ApplicationWindow{
     minimumHeight: 540
     minimumWidth: 700
 
-    title: qsTr("MSI Laptop Fan Control")
+    title: qsTr("MSi Laptop Fan Control")
     visible: true
 
     onClosing: {
