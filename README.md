@@ -18,7 +18,10 @@ I am testing on Ubuntu 20.04
 
 1. C++17 compiler
 2. Qt, I am using 5.15.1
-3. CMake
+3. [Toml++](https://github.com/marzer/tomlplusplus)
+4. [Magic Enum C++](https://github.com/Neargye/magic_enum)
+5. [GoogleTest](https://github.com/google/googletest)
+6. CMake
 
 ```modprobe ec_sys write_support=1```
 
