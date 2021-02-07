@@ -398,8 +398,6 @@ ApplicationWindow{
         }
 
         onActivated: {
-            console.log(reason)
-            console.log(window.visible, window.active)
             switch (reason){
             case Labs.SystemTrayIcon.Trigger:
                 if (window.visible && window.active){
