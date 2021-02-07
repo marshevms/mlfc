@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="/">
+        <file>main.qml</file>
+        <file>GraphControl.qml</file>
+    </qresource>
+    <qresource prefix="/icons">
+         <file>tray/fan.svg</file>
+    </qresource>
+</RCC>

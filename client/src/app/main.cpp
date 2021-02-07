@@ -12,11 +12,12 @@
 #include "cpu.h"
 #include "gpu.h"
 #include "fanmodemodel.h"
-
-
+#include "model/qmltempsfanspeeds.h"
 
 void RegisterMetaType()
-{
+{   
+    qRegisterMetaType<mlfc::model::qmlTempsFanSpeeds*>("const mlfc::model::qmlTempsFanSpeeds*");
+
     qmlRegisterType<mlfc::FanModeModel>("FanModeModel", 1, 0, "FanModeModel");
     qmlRegisterUncreatableMetaObject(mlfc::EnumerationStorage::staticMetaObject, "EnumerationStorage", 1, 0, "EnumerationStorage", "Access to enums & flags only");
 
@@ -45,10 +46,13 @@ int main(int argc, char **argv)
 
     mlfc::Client client;
 
+    mlfc::model::qmlTempsFanSpeeds tempsFanSpeeds;
+
     QQmlApplicationEngine engine;
     engine.rootContext()->setContextProperty(QStringLiteral("cpu"), &cpu);
     engine.rootContext()->setContextProperty(QStringLiteral("gpu"), &gpu);
     engine.rootContext()->setContextProperty(QStringLiteral("client"), &client);
+    engine.rootContext()->setContextProperty(QStringLiteral("tempsFanSpeeds"), &tempsFanSpeeds);
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
     if(engine.rootObjects().isEmpty())
         return -1;

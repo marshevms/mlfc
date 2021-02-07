@@ -1,11 +1,14 @@
 #include "client.h"
 
-#include <QTimer>
-#include <QDebug>
 #include <QMetaEnum>
+#include <QTimer>
+#include <QStandardPaths>
+#include <QFile>
+#include <QDebug>
 
 #include "cpu.h"
 #include "gpu.h"
+#include "config.h"
 #include "constants.h"
 
 namespace mlfc
@@ -13,6 +16,7 @@ namespace mlfc
 
 Client::Client(QObject *parent)
     : QObject(parent)
+    , config_(new Config(QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation).toStdString() + "/mlfc.toml"))
     , serverState_(ServerStates::Unknown)
     , coolerBoost_(CoolerBoost::Unknown)
     , fanMode_(FanMode::Unknown)
@@ -23,7 +27,7 @@ Client::Client(QObject *parent)
 bool Client::start(CPU *cpu, GPU *gpu)
 {
     if(!QDBusConnection::systemBus().registerService("com.github.mlfc.client")
-       || !QDBusConnection::systemBus().registerObject("/Client", this))
+            || !QDBusConnection::systemBus().registerObject("/Client", this))
     {
         setLastError(QDBusConnection::systemBus().lastError().message());
 
@@ -81,19 +85,19 @@ Client::ChartValues Client::chartValues()
 void Client::setCpuTemp(int temp)
 {
     cpu_->setTemp(temp);
-//    qDebug() << "cpu: " << temp;
+    //    qDebug() << "cpu: " << temp;
 }
 
 void Client::setCpuFanRmp(int rpm)
 {
     cpu_->setFanRpm(rpm);
-//    qDebug() << "cpu: " << rpm;
+    //    qDebug() << "cpu: " << rpm;
 }
 
 void Client::setGpuTemp(int temp)
 {
     gpu_->setTemp(temp);
-//    qDebug() << "gpu: " << temp;
+    //    qDebug() << "gpu: " << temp;
 }
 
 void Client::setGpuFanRmp(int rpm)
@@ -140,7 +144,11 @@ void Client::onSetFanModeClicked(const mlfc::EnumerationStorage::FanMode fanMode
         emit errorOccurred(serverLastError());
         return;
     }
+    setFanMode(fanMode);
+    setConfigMode(fanMode);
 
+    auto pair = getConfigValues(fanMode);
+    cmpAndChange(pair);
 }
 
 void Client::onSetChartValuesClicked(const EnumerationStorage::ChartValues chartValues)
@@ -149,33 +157,25 @@ void Client::onSetChartValuesClicked(const EnumerationStorage::ChartValues chart
     emit chartValuesChanged();
 }
 
-void Client::onSaveChartValuesClicked(const QVector<QPoint> &values)
+// I don't know why I can't use const model::qmlTempsFanSpeeds&
+void Client::onSaveChartValuesClicked(const QmlTempsFanSpeeds *tempsFanSpeeds, const ChartValues pu)
 {
-    QVector<int> temps;
-    QVector<int> fanSpeeds;
+    assert(tempsFanSpeeds && "type is nullptr");
 
-    temps.reserve(kTempsNumber);
-    fanSpeeds.reserve(kFanSpeedsNumber);
+    auto &temps = tempsFanSpeeds->tempsFanSpeeds.temps;
+    auto &fanSpeeds = tempsFanSpeeds->tempsFanSpeeds.fanSpeeds;
 
-    std::transform(values.begin() + 1, values.end(), std::back_inserter(temps), [](const QPoint &point){
-        return point.x();
-    });
-
-    std::transform(values.begin(), values.end(), std::back_inserter(fanSpeeds), [](const QPoint &point){
-        return point.y();
-    });
-
-    switch (chartValues_)
+    switch (pu)
     {
     case ChartValues::CPU:
     {
         qDebug() << "INFO: Trying to change cpu values";
 
-        auto resTemps = server_->setCPUTemps(temps);
-        auto resFanSpeeds = server_->setCPUFanSpeeds(fanSpeeds);
+        auto resTemps = server_->setCPUTemps(model::toQVector(temps));
+        auto resFanSpeeds = server_->setCPUFanSpeeds(model::toQVector(fanSpeeds));
 
-        cpu_->setTemps(temps);
-        cpu_->setFanSpeeds(fanSpeeds);
+        cpu_->setTemps(model::toQVector(temps));
+        cpu_->setFanSpeeds(model::toQVector(fanSpeeds));
 
         auto value = resTemps.value();
         if(resTemps.isError())
@@ -202,6 +202,13 @@ void Client::onSaveChartValuesClicked(const QVector<QPoint> &values)
             emit errorOccurred(serverLastError());
             return;
         }
+
+        if (!config_->setCpuTemps(temps, fanMode_) || !config_->setCpuFanSpeeds(fanSpeeds, fanMode_))
+        {
+            emit errorOccurred(("Can't set CPU values"));
+        }
+
+        saveConfig();
 
         break;
     }
@@ -209,11 +216,11 @@ void Client::onSaveChartValuesClicked(const QVector<QPoint> &values)
     {
         qDebug() << "INFO: Trying to change gpu values";
 
-        auto resTemps = server_->setGPUTemps(temps);
-        auto resFanSpeeds = server_->setGPUFanSpeeds(fanSpeeds);
+        auto resTemps = server_->setGPUTemps(model::toQVector(temps));
+        auto resFanSpeeds = server_->setGPUFanSpeeds(model::toQVector(fanSpeeds));
 
-        gpu_->setTemps(temps);
-        gpu_->setFanSpeeds(fanSpeeds);
+        gpu_->setTemps(model::toQVector(temps));
+        gpu_->setFanSpeeds(model::toQVector(fanSpeeds));
 
         auto value = resTemps.value();
         if(resTemps.isError())
@@ -240,6 +247,13 @@ void Client::onSaveChartValuesClicked(const QVector<QPoint> &values)
             emit errorOccurred(serverLastError());
             return;
         }
+
+        if (!config_->setGpuTemps(temps, fanMode_) || !config_->setGpuFanSpeeds(fanSpeeds, fanMode_))
+        {
+            emit errorOccurred(("Can't set GPU values"));
+        }
+
+        saveConfig();
 
         break;
     }
@@ -287,10 +301,15 @@ void Client::init()
 
         updateGpuTemps();
         updateGpuFanSpeeds();
+
+        checkConfig();
     });
 
     oneSecTimer->start(1000);
     fiveSecTimer->start(5000);
+
+    initConfig();
+    checkConfig();
 }
 
 void Client::startServer()
@@ -421,6 +440,172 @@ void Client::setServerState(const mlfc::EnumerationStorage::ServerStates state)
 {
     serverState_ = state;
     emit serverStateChanged();
+}
+
+void Client::readConfig()
+{
+    if(!config_->read())
+    {
+        setLastError(QString::fromStdString(config_->lastError()));
+        return emit errorOccurred(lastError());
+    }
+
+    if(!QFile::exists(QString::fromStdString(config_->getFilePath())))
+    {
+        return saveConfig();
+    }
+}
+
+void Client::saveConfig()
+{
+    if (!config_->save())
+    {
+        setLastError(QString::fromStdString(config_->lastError()));
+        return emit errorOccurred(lastError());
+    }
+}
+
+Client::CpuGpu Client::getConfigValues(const Client::FanMode mode, const QString &preset)
+{
+    CpuGpu result;
+
+    result.cpu.temps = config_->getCpuTemps(mode, preset.toStdString()).value_or(std::vector<int>{});
+    result.cpu.fanSpeeds = config_->getCpuFanSpeeds(mode, preset.toStdString()).value_or(std::vector<int>{});
+    result.gpu.temps = config_->getGpuTemps(mode, preset.toStdString()).value_or(std::vector<int>{});
+    result.gpu.fanSpeeds = config_->getGpuFanSpeeds(mode, preset.toStdString()).value_or(std::vector<int>{});
+
+    return result;
+}
+
+bool Client::setConfigValues(const Client::CpuGpu &pair, const Client::FanMode mode, const QString &preset)
+{
+    bool ok = true;
+
+    ok &= config_->setCpuTemps(pair.cpu.temps, mode, preset.toStdString());
+    ok &= config_->setCpuFanSpeeds(pair.cpu.fanSpeeds, mode, preset.toStdString());
+    ok &= config_->setGpuTemps(pair.gpu.temps, mode, preset.toStdString());
+    ok &= config_->setGpuFanSpeeds(pair.gpu.fanSpeeds, mode, preset.toStdString());
+
+    return ok;
+}
+
+Client::FanMode Client::getConfigMode()
+{
+    return config_->getCurrentMode();
+}
+
+bool Client::setConfigMode(const FanMode mode)
+{
+    if (config_->getCurrentMode() != mode)
+    {
+        return  config_->setCurrentMode(mode) && config_->save();
+    }
+    return true;
+}
+
+void Client::initConfig()
+{
+    readConfig();
+
+    auto isConfigEdit = false;
+
+    if (fanMode_ == FanMode::Auto && model::isEmpty(getConfigValues(FanMode::Auto)))
+    {
+        const auto cpuTemps = cpu_->temps();
+        const auto cpuFanSpeeds = cpu_->fanSpeeds();
+        const auto gpuTemps = gpu_->temps();
+        const auto gpuFanSpeeds = gpu_->fanSpeeds();
+
+        CpuGpu pair{{{cpuTemps.begin(), cpuTemps.end()}, {cpuFanSpeeds.begin(), cpuFanSpeeds.end()}}
+                    ,{{gpuTemps.begin(), gpuTemps.end()}, {gpuFanSpeeds.begin(), gpuFanSpeeds.end()}}};
+
+        if (!setConfigValues(pair, FanMode::Auto, ""))
+        {
+            setLastError(QString::fromStdString(config_->lastError()));
+            emit errorOccurred(lastError());
+        }
+        else
+        {
+            isConfigEdit = true;
+        }
+    } else if (fanMode_ != FanMode::Auto && model::isEmpty(getConfigValues(FanMode::Auto)))
+    {
+        setLastError(QString("please fill the config file: %1").arg(QString::fromStdString(config_->getFilePath())));
+        emit errorOccurred(lastError());
+    }
+
+    if (model::isEmpty(getConfigValues(FanMode::Advanced)))
+    {
+        auto pair = getConfigValues(FanMode::Auto);
+        if (!model::isEmpty(pair))
+        {
+            if (!setConfigValues(pair, FanMode::Advanced))
+            {
+                setLastError(QString::fromStdString(config_->lastError()));
+                emit errorOccurred(lastError());
+            }
+            else
+            {
+                isConfigEdit = true;
+            }
+        }
+    }
+
+    if (isConfigEdit && !config_->save())
+    {
+        setLastError(QString("can't save config file: %1").arg(QString::fromStdString(config_->lastError())));
+        emit errorOccurred(lastError());
+    }
+
+    return;
+}
+
+void Client::checkConfig()
+{
+    auto mode = getConfigMode();
+    auto pair = getConfigValues(mode);
+
+    if (model::isEmpty(pair))
+    {
+        setLastError(QString("please fill the config file: %1").arg(QString::fromStdString(config_->getFilePath())));
+        emit errorOccurred(lastError());
+        return;
+    }
+
+    if (mode != fanMode_) onSetFanModeClicked(mode);
+
+    cmpAndChange(pair);
+}
+
+void Client::cmpAndChange(Client::CpuGpu &pair)
+{
+     auto tempsFanSpeeds = std::make_unique<QmlTempsFanSpeeds>();
+
+     //CPU
+     {
+         auto temps = cpu_->rTemps();
+         auto fanSpeeds = cpu_->rFanSpeeds();
+         model::TempsFanSpeeds cpuPair{{temps.begin(), temps.end()}, {fanSpeeds.begin(), fanSpeeds.end()}};
+
+         if (!pair.cpu.isEqual(cpuPair))
+         {
+             tempsFanSpeeds->tempsFanSpeeds = std::move(pair.cpu);
+             onSaveChartValuesClicked(tempsFanSpeeds.get(),  ChartValues::CPU);
+         }
+     }
+
+     //GPU
+     {
+         auto temps = gpu_->rTemps();
+         auto fanSpeeds = gpu_->rFanSpeeds();;
+         model::TempsFanSpeeds gpuPair{{temps.begin(), temps.end()}, {fanSpeeds.begin(), fanSpeeds.end()}};
+
+         if (!pair.gpu.isEqual(gpuPair))
+         {
+             tempsFanSpeeds->tempsFanSpeeds = std::move(pair.gpu);
+             onSaveChartValuesClicked(tempsFanSpeeds.get(),  ChartValues::GPU);
+         }
+     }
 }
 
 void Client::setCpuTemps(const QVector<int> &temps)
