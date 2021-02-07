@@ -1,4 +1,4 @@
-# MSI Laptop Fan Control
+# MSi Laptop Fan Control
 
 This is an attempt to create an analogue of MSI Dragon Center for OS GNU/Linux.
 I am not a designer, so do not expect much.
