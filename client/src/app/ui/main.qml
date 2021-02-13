@@ -240,11 +240,17 @@ ApplicationWindow{
                 if (editOrSaveChartBtn.currentState === editOrSaveChartBtn.editingState && client.fanMode === EnumerationStorage.FanMode.Advanced){
                     graphControl.getScatterSeries().color = "#99ca53"
                     graphControl.getLineSeries().color = "#209fdf"
+
+                    graphControl.getScatterSeries().pointLabelsVisible = true
+
                     return true
                 }else{
                     graphControl.getScatterSeries().color = "gray"
                     graphControl.getLineSeries().color = "gray"
                     graphControl.updateGraph()
+
+                    graphControl.getScatterSeries().pointLabelsVisible = false
+
                     return false
                 }
             }
