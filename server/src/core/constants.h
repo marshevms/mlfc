@@ -61,6 +61,7 @@ enum class FanMode
     Unknown
 };
 
+static constexpr std::pair<int, int> kECVersion{0xA0, 8};
 
 } // namespace mlfc::core
 

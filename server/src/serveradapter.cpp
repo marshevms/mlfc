@@ -76,6 +76,11 @@ bool ServerAdapter::setGPUFanSpeeds(QVector<int> gpuFanSpeeds)
     return reinterpret_cast<mlfc::Server*>(this->parent())->setGPUFanSpeeds(gpuFanSpeeds);
 }
 
+QString ServerAdapter::ecVersion()
+{
+    return reinterpret_cast<mlfc::Server*>(this->parent())->ecVersion();
+}
+
 
 bool ServerAdapter::setUpdateInterval(int interval)
 {

@@ -286,4 +286,29 @@ CoolerBoost Reader::coolerBoost()
     }
 }
 
+std::string Reader::ecVersion()
+{
+    try
+    {
+        char ec[kECVersion.second];
+
+        file_.seekg(kECVersion.first);
+
+        file_.read(ec, kECVersion.second);
+
+        if(file_.gcount() != kECVersion.second)
+            throw std::runtime_error(std::string("While reading ec version: ") + "read " + std::to_string(file_.gcount()) + " byte(s), "
+                                     + "should read " + std::to_string(kECVersion.second) + "byte(s)");
+
+        return {ec, kECVersion.second};
+
+    }
+    catch (std::ios_base::failure &e)
+    {
+        throw std::runtime_error("While reading ec version: " + std::string(strerror(errno)));
+    }
+
+    return {};
+}
+
 } // namespace mlfc::core
