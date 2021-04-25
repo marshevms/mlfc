@@ -46,6 +46,7 @@ class Client : public QObject
     Q_PROPERTY(mlfc::EnumerationStorage::FanMode fanMode READ fanMode NOTIFY fanModeChanged)
     Q_PROPERTY(mlfc::EnumerationStorage::ChartValues chartValues READ chartValues WRITE onSetChartValuesClicked NOTIFY chartValuesChanged)
     Q_PROPERTY(mlfc::EnumerationStorage::IconTheme iconTheme READ iconTheme NOTIFY iconThemeChanged)
+    Q_PROPERTY(QString version READ Version NOTIFY versionChanged)
 public:
 
 
@@ -63,6 +64,8 @@ public:
 
     IconTheme iconTheme();
 
+    QString Version();
+
 signals:
     void errorOccurred(QString error);
     void serverStateChanged();
@@ -73,6 +76,8 @@ signals:
     void chartValuesChanged();
 
     void iconThemeChanged();
+
+    void versionChanged();
 
 public slots:
     void init();

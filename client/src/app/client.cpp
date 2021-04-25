@@ -11,6 +11,8 @@
 #include "config.h"
 #include "constants.h"
 
+#include "client_config.h"
+
 namespace mlfc
 {
 
@@ -89,6 +91,12 @@ Client::IconTheme Client::iconTheme()
 {
     return iconTheme_;
 }
+
+QString Client::Version()
+{
+    return PROJECT_VER;
+}
+
 
 void Client::setCpuTemp(int temp)
 {

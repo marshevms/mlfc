@@ -1,8 +1,10 @@
-project(${CMAKE_PROJECT_NAME}_client)
+project(${CMAKE_PROJECT_NAME}_client VERSION "0.5.0")
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
+
+configure_file(client_config.h.in ${PROJECT_SOURCE_DIR}/client_config.h)
 
 find_package(Qt5 COMPONENTS Widgets Core DBus Quick Charts REQUIRED)
 find_package(Qt5QuickCompiler)
