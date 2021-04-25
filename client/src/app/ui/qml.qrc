@@ -4,6 +4,7 @@
         <file>GraphControl.qml</file>
     </qresource>
     <qresource prefix="/icons">
-         <file>tray/fan.svg</file>
+         <file>tray/light_fan.svg</file>
+         <file>tray/dark_fan.svg</file>
     </qresource>
 </RCC>

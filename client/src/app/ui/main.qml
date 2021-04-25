@@ -402,9 +402,22 @@ ApplicationWindow{
     }
 
     Labs.SystemTrayIcon{
+        property string darkIcon: "qrc:/icons/tray/dark_fan.svg"
+        property string lightIcon: "qrc:/icons/tray/light_fan.svg"
+
+        id: menu
         visible: true
         tooltip: qsTr("MSi Laptop Fan Control")
-        icon.source: "qrc:/icons/tray/fan.svg"
+        icon.source: {
+            switch(client.iconTheme){
+            case EnumerationStorage.IconTheme.Unknown:
+                return lightIcon
+            case EnumerationStorage.IconTheme.Light:
+                return lightIcon
+            case EnumerationStorage.IconTheme.Dark:
+                return darkIcon
+            }
+        }
 
         menu: Labs.Menu{
             id: trayMenu
@@ -416,6 +429,18 @@ ApplicationWindow{
                     window.raise()
                     window.requestActivate()
                 }
+            }
+
+            Labs.MenuSeparator{}
+
+            Labs.MenuItem{
+                text: qsTr("Light Icon")
+                onTriggered: {client.onSetIconThemeClicked(EnumerationStorage.IconTheme.Light)}
+            }
+
+            Labs.MenuItem{
+                text: qsTr("Dark Icon")
+                onTriggered: {client.onSetIconThemeClicked(EnumerationStorage.IconTheme.Dark)}
             }
 
             Labs.MenuSeparator{}

@@ -37,6 +37,7 @@ class Client : public QObject
     using ServerStates = mlfc::EnumerationStorage::ServerStates;
     using CoolerBoost = mlfc::EnumerationStorage::CoolerBoost;
     using ChartValues = mlfc::EnumerationStorage::ChartValues;
+    using IconTheme = mlfc::EnumerationStorage::IconTheme;
 
     Q_OBJECT
     Q_CLASSINFO("D-Bus Interface", "com.github.mlfc.client")
@@ -44,6 +45,7 @@ class Client : public QObject
     Q_PROPERTY(mlfc::EnumerationStorage::CoolerBoost coolerBoost READ coolerBoost NOTIFY coolerBoostChanged)
     Q_PROPERTY(mlfc::EnumerationStorage::FanMode fanMode READ fanMode NOTIFY fanModeChanged)
     Q_PROPERTY(mlfc::EnumerationStorage::ChartValues chartValues READ chartValues WRITE onSetChartValuesClicked NOTIFY chartValuesChanged)
+    Q_PROPERTY(mlfc::EnumerationStorage::IconTheme iconTheme READ iconTheme NOTIFY iconThemeChanged)
 public:
 
 
@@ -59,6 +61,8 @@ public:
     FanMode fanMode();
     ChartValues chartValues();
 
+    IconTheme iconTheme();
+
 signals:
     void errorOccurred(QString error);
     void serverStateChanged();
@@ -68,6 +72,8 @@ signals:
 
     void chartValuesChanged();
 
+    void iconThemeChanged();
+
 public slots:
     void init();
 
@@ -76,6 +82,8 @@ public slots:
     void onSetChartValuesClicked(const mlfc::EnumerationStorage::ChartValues chartValues);
 
     void onSaveChartValuesClicked(const mlfc::model::qmlTempsFanSpeeds *tempsFanSpeeds, const mlfc::EnumerationStorage::ChartValues pu);
+
+    void onSetIconThemeClicked(const mlfc::EnumerationStorage::IconTheme theme);
 
 private:
     CPU *cpu_;
@@ -89,6 +97,8 @@ private:
     CoolerBoost coolerBoost_;
     FanMode fanMode_;
     ChartValues chartValues_;
+
+    IconTheme iconTheme_;
 
     QString lastError_;
 
@@ -131,6 +141,9 @@ private:
 
     FanMode getConfigMode();
     bool setConfigMode(const FanMode mode);
+
+    IconTheme getConfigIconTheme();
+    bool setConfigIconTheme(const IconTheme theme);
 
     void initConfig();
     void checkConfig();

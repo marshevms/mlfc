@@ -23,6 +23,7 @@ void RegisterMetaType()
 
     qDBusRegisterMetaType<mlfc::EnumerationStorage::CoolerBoost>();
     qDBusRegisterMetaType<mlfc::EnumerationStorage::FanMode>();
+    qDBusRegisterMetaType<mlfc::EnumerationStorage::IconTheme>();
 }
 
 
@@ -59,7 +60,7 @@ int main(int argc, char **argv)
 
     if(!client.start(&cpu, &gpu))
     {
-        qDebug() << client.lastError();
+        qDebug().noquote() << client.lastError();
 
         return -1;
     }

@@ -14,6 +14,7 @@ namespace mlfc::config
 class Config
 {
     using FanMode = EnumerationStorage::FanMode;
+    using IconTheme = EnumerationStorage::IconTheme;
     using Vector = std::optional<std::vector<int>>;
 public:
     Config();
@@ -24,6 +25,9 @@ public:
 
     [[nodiscard]] bool setCurrentMode(const FanMode mode);
     FanMode getCurrentMode() const;
+
+    [[nodiscard]] bool setIconTheme(const IconTheme theme);
+    IconTheme getIconTheme() const;
 
     //Set cpu values
     [[nodiscard]] bool setCpuTemps(const std::vector<int> &temps, const FanMode mode, const std::string_view option = "");
@@ -49,6 +53,7 @@ public:
 private:
 
     static constexpr std::string_view modeSTR_         {"mode"};
+    static constexpr std::string_view iconThemeStr_    {"icon_theme"};
     static constexpr std::string_view currentModeSTR_  {"current_mode"};
     static constexpr std::string_view autoSTR_         {"auto"};
     static constexpr std::string_view advancedSTR_     {"advanced"};
@@ -75,12 +80,14 @@ private:
     toml::table *auto_;
     toml::array *advanced_;
     toml::value<std::string> *currentMode_;
+    toml::value<std::string> *currentIconTheme_;
 
     std::map<std::string_view, toml::table*> advancedTables_;
 
     mutable std::string lastError_;
 
     //Set
+    [[nodiscard]] bool setCurrentIconTheme(const std::string &icon_theme);
     [[nodiscard]] bool setCurrentMode(const std::string &mode);
     [[nodiscard]] bool setValueSwitch(const std::vector<int> &value, const FanMode mode, const std::string_view key, const std::string_view option);
     [[nodiscard]] bool setValue(toml::table *tbl, const std::string_view key, const std::vector<int> &values);
@@ -92,8 +99,9 @@ private:
     //Validate and create default node for config
     [[nodiscard]] bool validate();
 
-    [[nodiscard]] bool validateMode(toml::node *node);
+    [[nodiscard]] bool validateIconTheme(toml::node *node);
     [[nodiscard]] bool validateCurrentMode(toml::node *node);
+    [[nodiscard]] bool validateMode(toml::node *node);
     [[nodiscard]] bool validateAuto(toml::node *node);
     [[nodiscard]] bool validateAdvanced(toml::node *node);
 
