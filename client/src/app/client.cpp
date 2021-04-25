@@ -26,11 +26,13 @@ Client::Client(QObject *parent)
 
 bool Client::start(CPU *cpu, GPU *gpu)
 {
-    if(!QDBusConnection::systemBus().registerService("com.github.mlfc.client")
-            || !QDBusConnection::systemBus().registerObject("/Client", this))
+    if(!QDBusConnection::systemBus().registerService("com.github.mlfc.client"))
     {
-        setLastError(QDBusConnection::systemBus().lastError().message());
-
+        setLastError("\"com.github.mlfc.client\" already exists");
+        return false;
+    }
+    if (!QDBusConnection::systemBus().registerObject("/Client", this)){
+        setLastError("object \"/Client\" already exists");
         return false;
     }
 
