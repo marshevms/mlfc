@@ -11,6 +11,8 @@ import EnumerationStorage 1.0
 import FanModeModel 1.0
 
 ApplicationWindow{
+    property int fontSize: 10
+
     id: window
     height: 540
     width: 700
@@ -90,6 +92,7 @@ ApplicationWindow{
 
             Label{
                 text: qsTr("Temperature")
+                font.pointSize: fontSize
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
             }
 
@@ -104,6 +107,7 @@ ApplicationWindow{
 
                     Label{
                         text: "CPU"
+                        font.pointSize: fontSize
                     }
 
                     ProgressBar{
@@ -117,10 +121,12 @@ ApplicationWindow{
 
                     Label{
                         text: cpu.temp + " \xB0C"
+                        font.pointSize: fontSize
                     }
 
                     Label{
                         text: "GPU"
+                        font.pointSize: fontSize
                     }
 
                     ProgressBar{
@@ -133,6 +139,7 @@ ApplicationWindow{
 
                     Label{
                         text: gpu.temp + " \xB0C"
+                        font.pointSize: fontSize
                     }
 
 
@@ -150,6 +157,7 @@ ApplicationWindow{
 
             Label{
                 text: qsTr("Fan Speed")
+                font.pointSize: fontSize
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
             }
 
@@ -164,19 +172,23 @@ ApplicationWindow{
 
                     Label{
                         text: "CPU"
+                        font.pointSize: fontSize
                     }
 
                     Label{
                         text: cpu.fanRPM + " RPM"
+                        font.pointSize: fontSize
                         Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
                     }
 
                     Label{
                         text: "GPU"
+                        font.pointSize: fontSize
                     }
 
                     Label{
                         text: gpu.fanRPM + " RPM"
+                        font.pointSize: fontSize
                         Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
                     }
 
@@ -188,8 +200,11 @@ ApplicationWindow{
 
         ComboBox{
             id: fanMode
+            font.pointSize: fontSize
             Layout.fillWidth: true
             Layout.columnSpan: 2
+            Layout.leftMargin: 10
+            Layout.rightMargin: 10
 
             textRole: "textRole"
             valueRole: "valueRole"
@@ -205,9 +220,11 @@ ApplicationWindow{
 
             Layout.fillWidth: true
             Layout.columnSpan: 2
+            Layout.leftMargin: 10
+            Layout.rightMargin: 10
 
             text: qsTr("Cooler Boost")
-            font.pointSize: 14
+            font.pointSize: 15
 
             checked:  {
                 switch(client.coolerBoost)
@@ -230,6 +247,7 @@ ApplicationWindow{
 
         GraphControl{
             id: graphControl
+            fontSize: fontSize
 
             Layout.fillHeight: true
             Layout.fillWidth: true
@@ -279,11 +297,13 @@ ApplicationWindow{
         ColumnLayout {
             Layout.fillHeight: true
             Layout.rowSpan: 2
+            Layout.rightMargin: 10
 
             ColumnLayout {
                 RadioButton {
                     checked: true
                     text: qsTr("CPU")
+                    font.pointSize: 15
                     ButtonGroup.group: radioGroup
 
                     onClicked: {
@@ -294,6 +314,7 @@ ApplicationWindow{
                 }
                 RadioButton {
                     text: qsTr("GPU")
+                    font.pointSize: 15
                     ButtonGroup.group: radioGroup
 
 
@@ -306,6 +327,7 @@ ApplicationWindow{
 
             Button{
                 id: editOrSaveChartBtn
+                font.pointSize: fontSize
 
                 property bool editingState: false
                 property bool savedState: true
@@ -354,6 +376,7 @@ ApplicationWindow{
 
         Button{
             text: qsTr("Try Restart Service")
+            font.pointSize: fontSize
 
             Layout.alignment: Qt.AlignRight
 
