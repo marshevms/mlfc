@@ -6,6 +6,21 @@ set(CMAKE_AUTOUIC ON)
 
 configure_file(client_config.h.in ${PROJECT_SOURCE_DIR}/client_config.h)
 
+# Get the current working branch
+execute_process(
+    COMMAND git rev-parse --abbrev-ref HEAD
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    OUTPUT_VARIABLE GIT_BRANCH
+    OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+# Get the latest commit hash
+execute_process(
+    COMMAND git rev-parse HEAD
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    OUTPUT_VARIABLE GIT_COMMIT_HASH
+    OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+
 find_package(Qt5 COMPONENTS Widgets Core DBus Quick Charts REQUIRED)
 find_package(Qt5QuickCompiler)
 
@@ -61,3 +76,5 @@ target_link_libraries(
     ${CMAKE_PROJECT_NAME}_config
 )
 
+target_compile_definitions(${PROJECT_NAME} PRIVATE
+    "-DGIT_COMMIT_HASH=\"${GIT_COMMIT_HASH}\"")
