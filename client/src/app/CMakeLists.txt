@@ -4,7 +4,7 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
-configure_file(client_config.h.in ${PROJECT_SOURCE_DIR}/client_config.h)
+configure_file(client_info.h.in ${PROJECT_SOURCE_DIR}/client_info.h)
 
 # Get the current working branch
 execute_process(
@@ -31,6 +31,7 @@ set(mlfc_headers
     fanmodemodel.h
     model/model.h
     model/qmltempsfanspeeds.h
+    appinfo.h
 )
 
 set(mlfc_sources
@@ -41,6 +42,7 @@ set(mlfc_sources
     fanmodemodel.cpp
     model/model.cpp
     model/qmltempsfanspeeds.cpp
+    appinfo.cpp
 )
 
 # #====================DBus==================================
