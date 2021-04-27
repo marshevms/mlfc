@@ -1,8 +1,25 @@
-project(${CMAKE_PROJECT_NAME}_client)
+project(${CMAKE_PROJECT_NAME}_client VERSION "0.5.0")
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
+
+configure_file(client_info.h.in ${PROJECT_SOURCE_DIR}/client_info.h)
+
+# Get the current working branch
+execute_process(
+    COMMAND git rev-parse --abbrev-ref HEAD
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    OUTPUT_VARIABLE GIT_BRANCH
+    OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+# Get the latest commit hash
+execute_process(
+    COMMAND git rev-parse HEAD
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    OUTPUT_VARIABLE GIT_COMMIT_HASH
+    OUTPUT_STRIP_TRAILING_WHITESPACE)
+
 
 find_package(Qt5 COMPONENTS Widgets Core DBus Quick Charts REQUIRED)
 find_package(Qt5QuickCompiler)
@@ -14,6 +31,7 @@ set(mlfc_headers
     fanmodemodel.h
     model/model.h
     model/qmltempsfanspeeds.h
+    appinfo.h
 )
 
 set(mlfc_sources
@@ -24,6 +42,7 @@ set(mlfc_sources
     fanmodemodel.cpp
     model/model.cpp
     model/qmltempsfanspeeds.cpp
+    appinfo.cpp
 )
 
 # #====================DBus==================================
@@ -59,3 +78,5 @@ target_link_libraries(
     ${CMAKE_PROJECT_NAME}_config
 )
 
+target_compile_definitions(${PROJECT_NAME} PRIVATE
+    "-DGIT_COMMIT_HASH=\"${GIT_COMMIT_HASH}\"")

@@ -21,16 +21,19 @@ Client::Client(QObject *parent)
     , coolerBoost_(CoolerBoost::Unknown)
     , fanMode_(FanMode::Unknown)
     , chartValues_(ChartValues::CPU)
+    , iconTheme_(IconTheme::Unknown)
 {
 }
 
 bool Client::start(CPU *cpu, GPU *gpu)
 {
-    if(!QDBusConnection::systemBus().registerService("com.github.mlfc.client")
-            || !QDBusConnection::systemBus().registerObject("/Client", this))
+    if(!QDBusConnection::systemBus().registerService("com.github.mlfc.client"))
     {
-        setLastError(QDBusConnection::systemBus().lastError().message());
-
+        setLastError("\"com.github.mlfc.client\" already exists");
+        return false;
+    }
+    if (!QDBusConnection::systemBus().registerObject("/Client", this)){
+        setLastError("object \"/Client\" already exists");
         return false;
     }
 
@@ -80,6 +83,11 @@ Client::FanMode Client::fanMode()
 Client::ChartValues Client::chartValues()
 {
     return chartValues_;
+}
+
+Client::IconTheme Client::iconTheme()
+{
+    return iconTheme_;
 }
 
 void Client::setCpuTemp(int temp)
@@ -258,6 +266,13 @@ void Client::onSaveChartValuesClicked(const QmlTempsFanSpeeds *tempsFanSpeeds, c
         break;
     }
     }
+}
+
+void Client::onSetIconThemeClicked(const EnumerationStorage::IconTheme theme)
+{
+    iconTheme_ = theme;
+    setConfigIconTheme(theme);
+    emit iconThemeChanged();
 }
 
 void Client::setCoolerBoost(const EnumerationStorage::CoolerBoost coolerBoost)
@@ -500,8 +515,25 @@ bool Client::setConfigMode(const FanMode mode)
     {
         return  config_->setCurrentMode(mode) && config_->save();
     }
+
     return true;
 }
+
+Client::IconTheme Client::getConfigIconTheme()
+{
+    return config_->getIconTheme();
+}
+
+bool Client::setConfigIconTheme(const Client::IconTheme theme)
+{
+    if(config_->getIconTheme() != theme)
+    {
+        return config_->setIconTheme(theme) && config_->save();
+    }
+
+    return true;
+}
+
 
 void Client::initConfig()
 {
@@ -563,6 +595,7 @@ void Client::initConfig()
 void Client::checkConfig()
 {
     auto mode = getConfigMode();
+    auto theme = getConfigIconTheme();
     auto pair = getConfigValues(mode);
 
     if (model::isEmpty(pair))
@@ -573,6 +606,7 @@ void Client::checkConfig()
     }
 
     if (mode != fanMode_) onSetFanModeClicked(mode);
+    if (theme != iconTheme_) onSetIconThemeClicked(theme);
 
     cmpAndChange(pair);
 }

@@ -137,6 +137,34 @@ Config::FanMode Config::getCurrentMode() const
     return FanMode::Unknown;
 }
 
+bool Config::setIconTheme(const Config::IconTheme theme)
+{
+    switch (theme)
+    {
+    case IconTheme::Light:
+        return setCurrentIconTheme("light");
+    case IconTheme::Dark:
+        return setCurrentIconTheme("dark");
+    default:
+        setLastError("theme is " + std::string{magic_enum::enum_name(theme)});
+        return false;
+    }
+}
+
+Config::IconTheme Config::getIconTheme() const
+{
+    if (!currentMode_)
+        return IconTheme::Unknown;
+
+    if (!currentIconTheme_->get().compare("light"))
+        return IconTheme::Light;
+
+    if (!currentIconTheme_->get().compare("dark"))
+        return IconTheme::Dark;
+
+    return IconTheme::Unknown;
+}
+
 bool Config::setCpuTemps(const std::vector<int> &temps, const FanMode mode, const std::string_view option)
 {
     return setValueSwitch(temps, mode, cpuTempsSTR_, option);
@@ -186,10 +214,24 @@ std::string Config::lastError() const
 {
     return lastError_;
 }
+
   
 void Config::setFilePath(const std::string &filePath)
 {
     filePath_ = filePath;
+}
+
+bool Config::setCurrentIconTheme(const std::string &icon_theme)
+{
+    if (!currentIconTheme_)
+    {
+        setLastError("node is nullptr");
+        return false;
+    }
+
+    currentIconTheme_->get().assign(icon_theme);
+
+    return true;
 }
 
 bool Config::setCurrentMode(const std::string &mode)
@@ -300,7 +342,9 @@ bool Config::validate()
     toml::node *node = nullptr;
 
     auto tbl = config_.as_table()->find(modeSTR_);
+    auto iconTheme = config_.as_table()->find(iconThemeStr_);
     auto currentMode = config_.as_table()->find(currentModeSTR_);
+
 
     //Mode
     if (tbl == config_.end())
@@ -319,6 +363,26 @@ bool Config::validate()
     }
 
     if (!validateMode(node)) return false;
+
+    node = nullptr;
+
+    //icon_theme
+    if (iconTheme == config_.end())
+    {
+        node = config_.insert(iconThemeStr_, toml::value<std::string>{}).first->second.as_string();
+    }
+    else if (!iconTheme->second.is_string())
+    {
+        //User, Why do you do this?
+        config_ = toml::table{};
+        return validate();
+    }
+    else
+    {
+        node = iconTheme->second.as_string();
+    }
+
+    if (!validateIconTheme(node)) return false;
 
     node = nullptr;
 
@@ -341,6 +405,52 @@ bool Config::validate()
     if (!validateCurrentMode(node)) return false;
 
     return true;
+}
+
+bool Config::validateIconTheme(toml::node *node)
+{
+    if (node == nullptr)
+    {
+        setLastError("node is nullptr");
+        return false;
+    }
+
+    if (node->is_string())
+    {
+        currentIconTheme_ = node->as_string();
+        if (currentIconTheme_->get().compare("light") && currentIconTheme_->get().compare("dark"))
+        {
+            currentIconTheme_->get().assign("light");
+        }
+        return true;
+    }
+
+    setLastError("node is not a string, it's a " + std::string{magic_enum::enum_name(node->type())});
+
+    return false;
+}
+
+bool Config::validateCurrentMode(toml::node *node)
+{
+    if (node == nullptr)
+    {
+        setLastError("node is nullptr");
+        return false;
+    }
+
+    if (node->is_string())
+    {
+        currentMode_ = node->as_string();
+        if (currentMode_->get().compare("auto") && currentMode_->get().compare("advanced"))
+        {
+            currentMode_->get().assign("auto");
+        }
+        return true;
+    }
+
+    setLastError("node is not a string, it's a " + std::string{magic_enum::enum_name(node->type())});
+
+    return false;
 }
 
 bool Config::validateMode(toml::node *node)
@@ -402,29 +512,6 @@ bool Config::validateMode(toml::node *node)
     if (!validateAdvanced(advanced_)) return false;
 
     return true;
-}
-
-bool Config::validateCurrentMode(toml::node *node)
-{
-    if (node == nullptr)
-    {
-        setLastError("node is nullptr");
-        return false;
-    }
-
-    if (node->is_string())
-    {
-        currentMode_ = node->as_string();
-        if (currentMode_->get().compare("auto") && currentMode_->get().compare("advanced"))
-        {
-            currentMode_->get().assign("auto");
-        }
-        return true;
-    }
-
-    setLastError("node is not a string, it's a " + std::string{magic_enum::enum_name(node->type())});
-
-    return false;
 }
 
 bool Config::validateAuto(toml::node *node)

@@ -327,6 +327,28 @@ bool Server::setGPUFanSpeeds(QVector<int> &gpuFanSpeeds)
     return false;
 }
 
+QString Server::ecVersion()
+{
+    if(server_status_ == ServerStatus::kOFF)
+    {
+        setLastError({"Server is not started yet"});
+        return {};
+    }
+
+    try
+    {
+        auto ec = manager_->ecVersion();
+        return QString::fromStdString(ec);
+    }
+    catch (std::runtime_error &e)
+    {
+        setLastError(e.what());
+        emit anErrorOccured(lastError());
+    }
+
+    return {};
+}
+
 bool Server::setUpdateInterval(int interval)
 {
     if(interval < kMinTimeoutSecs && interval > kMaxTimeoutSecs)

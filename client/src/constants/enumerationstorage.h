@@ -47,6 +47,14 @@ public:
         GPU
     };
     Q_ENUM(ChartValues)
+
+    enum class IconTheme
+    {
+        Light,
+        Dark,
+        Unknown
+    };
+    Q_ENUM(IconTheme)
 };
 
 } // namespace mlfc

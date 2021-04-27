@@ -86,11 +86,6 @@ void Manager::setFanMode(enum FanMode fan_mode)
 
 void Manager::setCPUTemps(const std::vector<int> &cpuTemps)
 {
-//    if (this->fanMode() != FanMode::Advanced)
-//    {
-//        throw std::logic_error("Can't set cpu temps if fan mode is not 'Advanced'");
-//    }
-
     if (cpuTemps.size() != kTempsNumber)
     {
         std::ostringstream out;
@@ -132,11 +127,6 @@ void Manager::setCPUTemps(const std::vector<int> &cpuTemps)
 
 void Manager::setCPUFanSpeeds(const std::vector<int> &cpuFanSpeeds)
 {
-//    if (this->fanMode() != FanMode::Advanced)
-//    {
-//        throw std::logic_error("Can't set cpu fan speeds if fan mode is not 'Advanced'");
-//    }
-
     if (cpuFanSpeeds.size() != kFanSpeedsNumber)
     {
         std::ostringstream out;
@@ -174,11 +164,6 @@ void Manager::setCPUFanSpeeds(const std::vector<int> &cpuFanSpeeds)
 
 void Manager::setGPUTemps(const std::vector<int> &gpuTemps)
 {
-//    if (this->fanMode() != FanMode::Advanced)
-//    {
-//        throw std::logic_error("Can't set gpu temps if fan mode is not 'Advanced'");
-//    }
-
     if (gpuTemps.size() != kTempsNumber)
     {
         std::ostringstream out;
@@ -220,11 +205,6 @@ void Manager::setGPUTemps(const std::vector<int> &gpuTemps)
 
 void Manager::setGPUFanSpeeds(const std::vector<int> &gpuFanSpeeds)
 {
-//    if (this->fanMode() != FanMode::Advanced)
-//    {
-//        throw std::logic_error("Can't set gpu fan speeds if fan mode is not 'Advanced'");
-//    }
-
     if (gpuFanSpeeds.size() != kFanSpeedsNumber)
     {
         std::ostringstream out;
@@ -277,7 +257,7 @@ void Manager::openFileRW(std::fstream &file)
 bool Manager::checkArrayValue(const std::vector<int> &values)
 {
     int oldValue = 0;
-    for(auto const & value : values)
+    for(auto const &value : values)
     {
         if (value < oldValue || value > 100)
             return false;

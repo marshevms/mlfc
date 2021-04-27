@@ -30,6 +30,8 @@ public:
     enum FanMode fanMode();
     enum CoolerBoost coolerBoost();
 
+    std::string ecVersion();
+
 private:
     std::fstream file_;
 };

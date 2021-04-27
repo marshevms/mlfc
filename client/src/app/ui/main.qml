@@ -11,22 +11,24 @@ import EnumerationStorage 1.0
 import FanModeModel 1.0
 
 ApplicationWindow{
-    id: window
-    height: 540
-    width: 700
+    property int fontSize: 10
 
-    minimumHeight: 540
-    minimumWidth: 700
+    id: window
 
     title: qsTr("MSi Laptop Fan Control")
     visible: true
+
+    height: 600
+    width: 800
+
+    minimumHeight: mainLayout.implicitHeight
+    minimumWidth: mainLayout.implicitWidth
 
     onClosing: {
         window.hide()
     }
 
-    Connections
-    {
+    Connections{
         target: client
         function onErrorOccurred(error) {
             console.log(error)
@@ -76,8 +78,12 @@ ApplicationWindow{
         icon: StandardIcon.Critical
     }
 
+    menuBar: MenuControl{
+       font.pointSize: fontSize
+    }
 
     GridLayout{
+        id: mainLayout
         columns: 4
 
         anchors.fill: parent
@@ -90,6 +96,7 @@ ApplicationWindow{
 
             Label{
                 text: qsTr("Temperature")
+                font.pointSize: fontSize
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
             }
 
@@ -104,6 +111,7 @@ ApplicationWindow{
 
                     Label{
                         text: "CPU"
+                        font.pointSize: fontSize
                     }
 
                     ProgressBar{
@@ -117,10 +125,12 @@ ApplicationWindow{
 
                     Label{
                         text: cpu.temp + " \xB0C"
+                        font.pointSize: fontSize
                     }
 
                     Label{
                         text: "GPU"
+                        font.pointSize: fontSize
                     }
 
                     ProgressBar{
@@ -133,6 +143,7 @@ ApplicationWindow{
 
                     Label{
                         text: gpu.temp + " \xB0C"
+                        font.pointSize: fontSize
                     }
 
 
@@ -150,6 +161,7 @@ ApplicationWindow{
 
             Label{
                 text: qsTr("Fan Speed")
+                font.pointSize: fontSize
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
             }
 
@@ -164,19 +176,23 @@ ApplicationWindow{
 
                     Label{
                         text: "CPU"
+                        font.pointSize: fontSize
                     }
 
                     Label{
                         text: cpu.fanRPM + " RPM"
+                        font.pointSize: fontSize
                         Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
                     }
 
                     Label{
                         text: "GPU"
+                        font.pointSize: fontSize
                     }
 
                     Label{
                         text: gpu.fanRPM + " RPM"
+                        font.pointSize: fontSize
                         Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
                     }
 
@@ -188,8 +204,11 @@ ApplicationWindow{
 
         ComboBox{
             id: fanMode
+            font.pointSize: fontSize
             Layout.fillWidth: true
             Layout.columnSpan: 2
+            Layout.leftMargin: 10
+            Layout.rightMargin: 10
 
             textRole: "textRole"
             valueRole: "valueRole"
@@ -205,9 +224,11 @@ ApplicationWindow{
 
             Layout.fillWidth: true
             Layout.columnSpan: 2
+            Layout.leftMargin: 10
+            Layout.rightMargin: 10
 
             text: qsTr("Cooler Boost")
-            font.pointSize: 14
+            font.pointSize: 15
 
             checked:  {
                 switch(client.coolerBoost)
@@ -230,6 +251,7 @@ ApplicationWindow{
 
         GraphControl{
             id: graphControl
+            fontSize: fontSize
 
             Layout.fillHeight: true
             Layout.fillWidth: true
@@ -240,11 +262,17 @@ ApplicationWindow{
                 if (editOrSaveChartBtn.currentState === editOrSaveChartBtn.editingState && client.fanMode === EnumerationStorage.FanMode.Advanced){
                     graphControl.getScatterSeries().color = "#99ca53"
                     graphControl.getLineSeries().color = "#209fdf"
+
+                    graphControl.getScatterSeries().pointLabelsVisible = true
+
                     return true
                 }else{
                     graphControl.getScatterSeries().color = "gray"
                     graphControl.getLineSeries().color = "gray"
                     graphControl.updateGraph()
+
+                    graphControl.getScatterSeries().pointLabelsVisible = false
+
                     return false
                 }
             }
@@ -273,11 +301,13 @@ ApplicationWindow{
         ColumnLayout {
             Layout.fillHeight: true
             Layout.rowSpan: 2
+            Layout.rightMargin: 10
 
             ColumnLayout {
                 RadioButton {
                     checked: true
                     text: qsTr("CPU")
+                    font.pointSize: 15
                     ButtonGroup.group: radioGroup
 
                     onClicked: {
@@ -288,6 +318,7 @@ ApplicationWindow{
                 }
                 RadioButton {
                     text: qsTr("GPU")
+                    font.pointSize: 15
                     ButtonGroup.group: radioGroup
 
 
@@ -300,6 +331,7 @@ ApplicationWindow{
 
             Button{
                 id: editOrSaveChartBtn
+                font.pointSize: fontSize
 
                 property bool editingState: false
                 property bool savedState: true
@@ -348,6 +380,7 @@ ApplicationWindow{
 
         Button{
             text: qsTr("Try Restart Service")
+            font.pointSize: fontSize
 
             Layout.alignment: Qt.AlignRight
 
@@ -373,9 +406,22 @@ ApplicationWindow{
     }
 
     Labs.SystemTrayIcon{
+        property string darkIcon: "qrc:/icons/tray/dark_fan.svg"
+        property string lightIcon: "qrc:/icons/tray/light_fan.svg"
+
+        id: menu
         visible: true
         tooltip: qsTr("MSi Laptop Fan Control")
-        icon.source: "qrc:/icons/tray/fan.svg"
+        icon.source: {
+            switch(client.iconTheme){
+            case EnumerationStorage.IconTheme.Unknown:
+                return lightIcon
+            case EnumerationStorage.IconTheme.Light:
+                return lightIcon
+            case EnumerationStorage.IconTheme.Dark:
+                return darkIcon
+            }
+        }
 
         menu: Labs.Menu{
             id: trayMenu
@@ -387,6 +433,18 @@ ApplicationWindow{
                     window.raise()
                     window.requestActivate()
                 }
+            }
+
+            Labs.MenuSeparator{}
+
+            Labs.MenuItem{
+                text: qsTr("Light Icon")
+                onTriggered: {client.onSetIconThemeClicked(EnumerationStorage.IconTheme.Light)}
+            }
+
+            Labs.MenuItem{
+                text: qsTr("Dark Icon")
+                onTriggered: {client.onSetIconThemeClicked(EnumerationStorage.IconTheme.Dark)}
             }
 
             Labs.MenuSeparator{}
