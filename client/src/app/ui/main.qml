@@ -14,14 +14,15 @@ ApplicationWindow{
     property int fontSize: 10
 
     id: window
-    height: 540
-    width: 700
-
-    minimumHeight: 540
-    minimumWidth: 700
 
     title: qsTr("MSi Laptop Fan Control")
     visible: true
+
+    height: 600
+    width: 800
+
+    minimumHeight: mainLayout.implicitHeight
+    minimumWidth: mainLayout.implicitWidth
 
     onClosing: {
         window.hide()
@@ -82,6 +83,7 @@ ApplicationWindow{
     }
 
     GridLayout{
+        id: mainLayout
         columns: 4
 
         anchors.fill: parent
