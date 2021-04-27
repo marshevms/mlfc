@@ -2,9 +2,15 @@
     <qresource prefix="/">
         <file>main.qml</file>
         <file>GraphControl.qml</file>
+        <file>MenuControl.qml</file>
     </qresource>
     <qresource prefix="/icons">
-         <file>tray/light_fan.svg</file>
-         <file>tray/dark_fan.svg</file>
+     </qresource>
+    <qresource prefix="/icons/tray">
+        <file alias="light_fan.svg">icons/light_fan.svg</file>
+        <file alias="dark_fan.svg">icons/dark_fan.svg</file>
+    </qresource>
+    <qresource prefix="/icons/app">
+        <file alias="mail-send.svg">icons/mail-send.svg</file>
     </qresource>
 </RCC>
