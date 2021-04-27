@@ -257,7 +257,7 @@ void Manager::openFileRW(std::fstream &file)
 bool Manager::checkArrayValue(const std::vector<int> &values)
 {
     int oldValue = 0;
-    for(auto const & value : values)
+    for(auto const &value : values)
     {
         if (value < oldValue || value > 100)
             return false;
