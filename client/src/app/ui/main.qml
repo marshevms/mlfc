@@ -27,8 +27,7 @@ ApplicationWindow{
         window.hide()
     }
 
-    Connections
-    {
+    Connections{
         target: client
         function onErrorOccurred(error) {
             console.log(error)
@@ -78,6 +77,9 @@ ApplicationWindow{
         icon: StandardIcon.Critical
     }
 
+    menuBar: MenuControl{
+       font.pointSize: fontSize
+    }
 
     GridLayout{
         columns: 4

@@ -4,10 +4,12 @@
 
 #include <QDBusConnection>
 #include <QDBusServiceWatcher>
-#include <QDebug>
 #include <qdbusmetatype.h>
 
+#include <QDebug>
+
 #include "client.h"
+#include "appinfo.h"
 #include "enumerationstorage.h"
 #include "cpu.h"
 #include "gpu.h"
@@ -46,6 +48,7 @@ int main(int argc, char **argv)
     mlfc::GPU gpu;
 
     mlfc::Client client;
+    mlfc::AppInfo appInfo;
 
     mlfc::model::qmlTempsFanSpeeds tempsFanSpeeds;
 
@@ -53,6 +56,7 @@ int main(int argc, char **argv)
     engine.rootContext()->setContextProperty(QStringLiteral("cpu"), &cpu);
     engine.rootContext()->setContextProperty(QStringLiteral("gpu"), &gpu);
     engine.rootContext()->setContextProperty(QStringLiteral("client"), &client);
+    engine.rootContext()->setContextProperty(QStringLiteral("appInfo"), &appInfo);
     engine.rootContext()->setContextProperty(QStringLiteral("tempsFanSpeeds"), &tempsFanSpeeds);
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
     if(engine.rootObjects().isEmpty())
