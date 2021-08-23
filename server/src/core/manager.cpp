@@ -9,7 +9,6 @@ namespace mlfc::core
 
 Manager::Manager() : Reader()
 {
-
 }
 
 void Manager::setCoolerBoost(enum CoolerBoost coolerboost)
@@ -62,13 +61,14 @@ void Manager::setFanMode(enum FanMode fan_mode)
         switch (fan_mode)
         {
         case FanMode::Auto:
-            data = kFanModeAuto;
+            //TODO cast
+            data = kFanModeAuto[static_cast<int>(fanModeType())];
             break;
         case FanMode::Basic:
-            data = kFanModeBasic;
+            data = kFanModeBasic[static_cast<int>(fanModeType())];
             break;
         case FanMode::Advanced:
-            data = kFanModeAdvanced;
+            data = kFanModeAdvanced[static_cast<int>(fanModeType())];
             break;
         case FanMode::Unknown:
             return;

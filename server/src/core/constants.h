@@ -49,9 +49,15 @@ enum class CoolerBoost
     Unknown
 };
 
-constexpr int kFanModeAuto{0x0C};
-constexpr int kFanModeBasic{0x4C};
-constexpr int kFanModeAdvanced{0x8C};
+static constexpr std::array<int, 2>  kFanModeAuto{0x0C, 0x0D};
+static constexpr std::array<int, 2>  kFanModeBasic{0x4C, 0x4D};
+static constexpr std::array<int, 2>  kFanModeAdvanced{0x8C, 0x8D};
+
+//TODO naming
+enum class FanModeType{
+    Type1 = 0,
+    Type2,
+};
 
 enum class FanMode
 {
