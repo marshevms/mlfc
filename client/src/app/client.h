@@ -46,6 +46,8 @@ class Client : public QObject
     Q_PROPERTY(mlfc::EnumerationStorage::FanMode fanMode READ fanMode NOTIFY fanModeChanged)
     Q_PROPERTY(mlfc::EnumerationStorage::ChartValues chartValues READ chartValues WRITE onSetChartValuesClicked NOTIFY chartValuesChanged)
     Q_PROPERTY(mlfc::EnumerationStorage::IconTheme iconTheme READ iconTheme NOTIFY iconThemeChanged)
+    Q_PROPERTY(QString srvVersion READ serverVersion NOTIFY serverVersionChanged)
+    Q_PROPERTY(QString ecVersion READ ecVersion NOTIFY ecVersionChanged)
 
 public:
 
@@ -60,8 +62,11 @@ public:
     CoolerBoost coolerBoost();
     FanMode fanMode();
     ChartValues chartValues();
+    QString serverVersion();
+    QString ecVersion();
 
     IconTheme iconTheme();
+
 
 signals:
     void errorOccurred(QString error);
@@ -71,6 +76,9 @@ signals:
     void fanModeChanged();
 
     void chartValuesChanged();
+
+    void serverVersionChanged();
+    void ecVersionChanged();
 
     void iconThemeChanged();
 
@@ -97,6 +105,8 @@ private:
     CoolerBoost coolerBoost_;
     FanMode fanMode_;
     ChartValues chartValues_;
+    QString srvVersion_;
+    QString ecVersion_;
 
     IconTheme iconTheme_;
 
@@ -117,6 +127,10 @@ private:
     void setGpuTemps(const QVector<int> &temps);
     void setGpuFanSpeeds(const QVector<int> &fanSpeeds);
 
+    void setServerVersion(const QString &ecVersion);
+
+    void setECVersion(const QString &ecVersion);
+
     QString serverLastError();
 
     //INIT Functions
@@ -129,6 +143,8 @@ private:
     void updateCpuFanSpeeds();
     void updateGpuTemps();
     void updateGpuFanSpeeds();
+    void updateServerVersion();
+    void updateECVersion();
 
     void setServerState(const mlfc::EnumerationStorage::ServerStates state);
 

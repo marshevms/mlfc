@@ -1,12 +1,15 @@
 cmake_minimum_required(VERSION 3.10)
 
-project(mlfc_server)
+project(mlfc_server VERSION "0.5.0")
 
 set(CMAKE_CXX_STANDARD 17)
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
+
+
+configure_file(server_info.h.in ${PROJECT_SOURCE_DIR}/server_info.h)
 
 find_package(Qt5 COMPONENTS Core DBus REQUIRED)
 
