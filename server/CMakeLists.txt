@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 
-project(mlfc_server VERSION "0.5.0")
+project(mlfc_server VERSION "0.5.1")
 
 set(CMAKE_CXX_STANDARD 17)
 
