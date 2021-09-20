@@ -1,4 +1,4 @@
-project(${CMAKE_PROJECT_NAME}_client VERSION "0.5.0")
+project(${CMAKE_PROJECT_NAME}_client VERSION "0.5.1")
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)

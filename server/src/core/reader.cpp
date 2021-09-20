@@ -15,6 +15,7 @@ Reader::Reader()
     try
     {
         file_.open(kECFilePath, std::fstream::in | std::fstream::binary);
+        fanModeType_ = defineFanModeType();
     }
     catch (std::ios_base::failure &e)
     {
@@ -233,25 +234,14 @@ FanMode Reader::fanMode()
 {
     try
     {
-        file_.seekg(kFanMode);
-
-        unsigned char data = 0;
-        file_.read(reinterpret_cast<char*>(&data), sizeof (data));
-
-        if(file_.gcount() != sizeof (data))
-            throw std::runtime_error(std::string("While reading fan mode: ") + "read " + std::to_string(file_.gcount()) + " byte(s), "
-                                     + "should read " + std::to_string(data) + "byte(s)");
-
-        switch (static_cast<int>(data))
-        {
-        case kFanModeAuto:
+        if (const auto value = static_cast<int>(fanModeValue()); value == kFanModeAuto[static_cast<int>(fanModeType_)]){
             return FanMode::Auto;
-        case kFanModeBasic:
+        } else if (value == kFanModeBasic[static_cast<int>(fanModeType_)]){
             return FanMode::Basic;
-        case kFanModeAdvanced:
+        } else if (value == kFanModeAdvanced[static_cast<int>(fanModeType_)]){
             return FanMode::Advanced;
-        default:
-            throw std::runtime_error(std::string("While reading fan mode: ") + "unknown fan mode: " + std::to_string(static_cast<int>(data)));
+        } else {
+            throw std::runtime_error(std::string("While reading fan mode: ") + "unknown fan mode: " + std::to_string(value));
         }
 
     }
@@ -309,6 +299,42 @@ std::string Reader::ecVersion()
     }
 
     return {};
+}
+
+FanModeType Reader::fanModeType()
+{
+    return fanModeType_;
+}
+
+unsigned char Reader::fanModeValue()
+{
+    unsigned char data = 0;
+
+    file_.seekg(kFanMode);
+    file_.read(reinterpret_cast<char*>(&data), sizeof (data));
+
+    if(file_.gcount() != sizeof (data))
+        throw std::runtime_error(std::string("While reading fan mode: ") + "read " + std::to_string(file_.gcount()) + " byte(s), "
+                                 + "should read " + std::to_string(data) + "byte(s)");
+
+    return data;
+}
+
+// TODO think about ec version
+FanModeType Reader::defineFanModeType()
+{
+    static constexpr unsigned char mask = 0x3;   //      0000 0011
+    auto data = fanModeValue();                  // OD - 0000 1101
+
+    switch (auto value = data & mask; value) {
+    case 0: return FanModeType::TypeC;
+    case 1: return FanModeType::TypeD;
+    }
+
+    std::cerr << "fan_mode value is " << std::hex << static_cast<int>(data)  << ", please create the issue\n"
+              << "on https://github.com/marshevms/mlfc/issues and mark it as \"unknown fan mode\"" << std:: endl;
+
+    return FanModeType::TypeC;
 }
 
 } // namespace mlfc::core

@@ -77,6 +77,12 @@ public Q_SLOTS: // METHODS
         return asyncCallWithArgumentList(QStringLiteral("setGPUFanSpeeds"), argumentList);
     }
 
+    inline QDBusPendingReply<QString> serverVersion()
+    {
+        QList<QVariant> argumentList;
+        return asyncCallWithArgumentList(QStringLiteral("serverVersion"), argumentList);
+    }
+
     inline QDBusPendingReply<QString> ecVersion()
     {
         QList<QVariant> argumentList;

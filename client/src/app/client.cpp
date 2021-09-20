@@ -17,6 +17,7 @@ namespace mlfc
 Client::Client(QObject *parent)
     : QObject(parent)
     , config_(new Config(QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation).toStdString() + "/mlfc.toml"))
+    , server_(nullptr)
     , serverState_(ServerStates::Unknown)
     , coolerBoost_(CoolerBoost::Unknown)
     , fanMode_(FanMode::Unknown)
@@ -85,9 +86,27 @@ Client::ChartValues Client::chartValues()
     return chartValues_;
 }
 
+QString Client::serverVersion()
+{
+    if (srvVersion_.isEmpty()) {
+        return "unknown";
+    }
+
+    return srvVersion_;
+}
+
 Client::IconTheme Client::iconTheme()
 {
     return iconTheme_;
+}
+
+QString Client::ecVersion()
+{
+    if (ecVersion_.isEmpty()) {
+        return "unknown";
+    }
+
+    return ecVersion_;
 }
 
 void Client::setCpuTemp(int temp)
@@ -303,6 +322,10 @@ void Client::init()
     updateGpuTemps();
     updateGpuFanSpeeds();
 
+    updateServerVersion();
+
+    updateECVersion();
+
     QTimer *oneSecTimer = new QTimer(this);
     QTimer *fiveSecTimer = new QTimer(this);
 
@@ -448,6 +471,50 @@ void Client::updateGpuFanSpeeds()
     }
 
     return setGpuFanSpeeds(value);
+}
+
+void Client::updateServerVersion()
+{
+    auto res = server_->serverVersion();
+    res.waitForFinished();
+
+    if(res.isError())
+    {
+        setCoolerBoost(CoolerBoost::Unknown);
+        emit errorOccurred(res.error().message());
+        return;
+    }
+
+    if(const auto srvVersion = res.value(); srvVersion.isEmpty())
+    {
+        setCoolerBoost(CoolerBoost::Unknown);
+        emit errorOccurred(serverLastError());
+        return;
+    } else {
+        setServerVersion(srvVersion);
+    }
+}
+
+void Client::updateECVersion()
+{
+    auto res = server_->ecVersion();
+    res.waitForFinished();
+
+    if(res.isError())
+    {
+        setCoolerBoost(CoolerBoost::Unknown);
+        emit errorOccurred(res.error().message());
+        return;
+    }
+
+    if(const auto ec = res.value(); ec.isEmpty())
+    {
+        setCoolerBoost(CoolerBoost::Unknown);
+        emit errorOccurred(serverLastError());
+        return;
+    } else {
+        setECVersion(ec);
+    }
 }
 
 
@@ -672,6 +739,18 @@ void Client::setGpuFanSpeeds(const QVector<int> &fanSpeeds)
     {
         qDebug() << "ERROR: Can't set GPU fan speeds";
     }
+}
+
+void Client::setServerVersion(const QString &srvVersion)
+{
+    srvVersion_ = srvVersion;
+    serverVersionChanged();
+}
+
+void Client::setECVersion(const QString &ecVersion)
+{
+    ecVersion_ = ecVersion;
+    emit ecVersionChanged();
 }
 
 QString Client::serverLastError()
