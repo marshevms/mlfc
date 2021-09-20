@@ -4,6 +4,7 @@
 
 #include "serveradapter.h"
 #include "core/manager.h"
+#include "../server_info.h"
 
 namespace mlfc
 {
@@ -362,6 +363,11 @@ bool Server::setUpdateInterval(int interval)
 int Server::updateInterval() const
 {
     return timer_->interval();
+}
+
+QString Server::serverVersion()
+{
+    return PROJECT_VER;
 }
 
 QString Server::lastError() const

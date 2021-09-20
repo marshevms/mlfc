@@ -115,6 +115,8 @@ MenuBar{
 
                 Text {
                     text: "Version: " + appInfo.version +
+                          "\nServer Version: " + client.srvVersion +
+                          "\nEC Version: " + client.ecVersion +
                           "\nCommit: " + appInfo.commit
                     font.pointSize: fontSize
                 }

@@ -47,6 +47,7 @@ public slots:
     bool setGPUTemps(QVector<int> gpuTemps);
     bool setGPUFanSpeeds(QVector<int> gpuFanSpeeds);
 
+    QString serverVersion();
     QString ecVersion();
 
     bool setUpdateInterval(int interval);

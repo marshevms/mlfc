@@ -70,6 +70,8 @@ public slots:
     bool setUpdateInterval(int interval);
     int updateInterval() const;
 
+    QString serverVersion();
+
     QString lastError() const;
 
 private:
