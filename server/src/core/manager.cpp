@@ -61,7 +61,6 @@ void Manager::setFanMode(enum FanMode fan_mode)
         switch (fan_mode)
         {
         case FanMode::Auto:
-            //TODO cast
             data = kFanModeAuto[static_cast<int>(fanModeType())];
             break;
         case FanMode::Basic:

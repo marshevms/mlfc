@@ -234,7 +234,6 @@ FanMode Reader::fanMode()
 {
     try
     {
-        //TODO cast
         if (const auto value = static_cast<int>(fanModeValue()); value == kFanModeAuto[static_cast<int>(fanModeType_)]){
             return FanMode::Auto;
         } else if (value == kFanModeBasic[static_cast<int>(fanModeType_)]){
@@ -328,14 +327,14 @@ FanModeType Reader::defineFanModeType()
     auto data = fanModeValue();                  // OD - 0000 1101
 
     switch (auto value = data & mask; value) {
-    case 0: return FanModeType::Type1;
-    case 1: return FanModeType::Type2;
+    case 0: return FanModeType::TypeC;
+    case 1: return FanModeType::TypeD;
     }
 
     std::cerr << "fan_mode value is " << std::hex << static_cast<int>(data)  << ", please create the issue\n"
               << "on https://github.com/marshevms/mlfc/issues and mark it as \"unknown fan mode\"" << std:: endl;
 
-    return FanModeType::Type1;
+    return FanModeType::TypeC;
 }
 
 } // namespace mlfc::core
