@@ -32,8 +32,15 @@ public:
 
     std::string ecVersion();
 
+protected:
+    enum FanModeType fanModeType();
+
 private:
     std::fstream file_;
+    FanModeType fanModeType_;
+
+    unsigned char fanModeValue();
+    enum FanModeType defineFanModeType();
 };
 
 } // namespace mlfc::core
