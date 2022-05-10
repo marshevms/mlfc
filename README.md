@@ -1,3 +1,5 @@
+I need your feedback https://github.com/marshevms/mlfc/discussions/31
+
 # MSi Laptop Fan Control
 
 This is an attempt to create an analogue of MSI Dragon Center for OS GNU/Linux.
