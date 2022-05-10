@@ -1,4 +1,4 @@
-I need your feedback https://github.com/marshevms/mlfc/discussions/31
+# I need your feedback https://github.com/marshevms/mlfc/discussions/31
 
 # MSi Laptop Fan Control
 
