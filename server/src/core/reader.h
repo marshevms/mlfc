@@ -34,13 +34,16 @@ public:
 
 protected:
     enum FanModeType fanModeType();
+    enum CpuIntelGen cpuIntelgen();
 
 private:
     std::fstream file_;
     FanModeType fanModeType_;
+    CpuIntelGen cpuIntelGen_;
 
     unsigned char fanModeValue();
     enum FanModeType defineFanModeType();
+    enum CpuIntelGen defineCpuIntelGen();
 };
 
 } // namespace mlfc::core

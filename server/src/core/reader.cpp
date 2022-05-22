@@ -16,6 +16,7 @@ Reader::Reader()
     {
         file_.open(kECFilePath, std::fstream::in | std::fstream::binary);
         fanModeType_ = defineFanModeType();
+        cpuIntelGen_ = defineCpuIntelGen();
     }
     catch (std::ios_base::failure &e)
     {
@@ -52,9 +53,9 @@ int Reader::realtimeCPUFanRPM()
 {
     try
     {
-        file_.seekg(cpu::kRealtimeFanRPM[0]);
+        file_.seekg(cpu::kRealtimeFanRPM[static_cast<int>(cpuIntelGen_)][0]);
 
-        unsigned char data[cpu::kRealtimeFanRPM.size()];
+        unsigned char data[cpu::kRealtimeFanRPM[static_cast<int>(cpuIntelGen_)].size()];
         file_.read(reinterpret_cast<char*>(&data), sizeof (data));
 
         if(file_.gcount() != sizeof (data))
@@ -153,9 +154,9 @@ int Reader::realtimeGPUFanRPM()
 {
     try
     {
-        file_.seekg(gpu::kRealtimeFanRPM[0]);
+        file_.seekg(gpu::kRealtimeFanRPM[static_cast<int>(cpuIntelGen_)][0]);
 
-        unsigned char data[gpu::kRealtimeFanRPM.size()];
+        unsigned char data[gpu::kRealtimeFanRPM[static_cast<int>(cpuIntelGen_)].size()];
         file_.read(reinterpret_cast<char*>(&data), sizeof (data));
 
         if(file_.gcount() != sizeof (data))
@@ -306,6 +307,11 @@ FanModeType Reader::fanModeType()
     return fanModeType_;
 }
 
+CpuIntelGen Reader::cpuIntelgen()
+{
+    return cpuIntelGen_;
+}
+
 unsigned char Reader::fanModeValue()
 {
     unsigned char data = 0;
@@ -335,6 +341,26 @@ FanModeType Reader::defineFanModeType()
               << "on https://github.com/marshevms/mlfc/issues and mark it as \"unknown fan mode\"" << std:: endl;
 
     return FanModeType::TypeC;
+}
+
+CpuIntelGen Reader::defineCpuIntelGen()
+{
+    auto file = std::fstream();
+
+    file.open(kCpuIntelGenInfoPath, std::fstream::in);
+
+    if (!file.is_open()){
+        std::cerr << "An attempt to open the \"" + std::string(kCpuIntelGenInfoPath) + "\" file resulted in an error: " + std::string(strerror(errno));
+        return CpuIntelGen::Default;
+    }
+    char name[256] = {0};
+    file.getline(name,256);
+
+    if (!strcmp(name, kCpuIntelGen11)){
+        return CpuIntelGen::Gen11;
+    }
+
+    return CpuIntelGen::Default;
 }
 
 } // namespace mlfc::core
