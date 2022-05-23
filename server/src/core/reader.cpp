@@ -4,6 +4,7 @@
 #include <system_error>
 #include <string>
 #include <string.h>
+#include <cpuid.h>
 
 namespace mlfc::core
 {
@@ -345,18 +346,22 @@ FanModeType Reader::defineFanModeType()
 
 CpuIntelGen Reader::defineCpuIntelGen()
 {
-    auto file = std::fstream();
+    unsigned int eax = 0;
+    unsigned int ebx = 0;
+    unsigned int ecx = 0;
+    unsigned int edx = 0;
 
-    file.open(kCpuIntelGenInfoPath, std::fstream::in);
-
-    if (!file.is_open()){
-        std::cerr << "An attempt to open the \"" + std::string(kCpuIntelGenInfoPath) + "\" file resulted in an error: " + std::string(strerror(errno));
+    if (__get_cpuid(1, &eax, &ebx, &ecx, &edx) == 0){
+        std::cerr << "failed to check cpuid";
         return CpuIntelGen::Default;
     }
-    char name[256] = {0};
-    file.getline(name,256);
 
-    if (!strcmp(name, kCpuIntelGen11)){
+    unsigned int efamily = (eax >> 20) & 0xFF;
+    unsigned int emodel = (eax >> 16) & 0xF;
+    unsigned int family = (eax >> 8) & 0xF;
+    unsigned int model = (eax >> 4) & 0xF;
+
+    if (efamily == 0 && family == 6 && emodel == 10 && model == 7){
         return CpuIntelGen::Gen11;
     }
 
