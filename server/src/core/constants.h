@@ -15,8 +15,6 @@ static constexpr char kECFilePath[]{"io"};
 // CPU Info
 static constexpr char kCpuIntelGenInfoPath[]{"/sys/devices/cpu/caps/pmu_name"};
 
-static constexpr char kCpuIntelGen11[]{"rocket lake"};
-
 static constexpr int kTempsNumber = 6;
 static constexpr int kFanSpeedsNumber = 7;
 
@@ -29,7 +27,7 @@ struct cpu
     static constexpr int kRealtimeTemp{0x68};
     static constexpr std::array<std::array<int, 2>, 2> kRealtimeFanRPM{
        std::array{0xCC, 0xCD},
-       std::array{0xCA, 0xCB},
+       std::array{0xC8, 0xC9},
     };
     static constexpr std::array<int, kTempsNumber> kTemps{0x6A, 0x6B, 0x6C
                                                           ,0x6D, 0x6E, 0x6F};
@@ -42,7 +40,7 @@ struct gpu
     static constexpr int kRealtimeTemp{0x80};
     static constexpr std::array<std::array<int, 2>, 2> kRealtimeFanRPM{
         std::array{0xCA, 0xCB},
-        std::array{0xC8, 0xC9},
+        std::array{0xCA, 0xCB},
     };
     static constexpr std::array<int, kTempsNumber> kTemps{0x82, 0x83, 0x84
                                                           ,0x85, 0x86, 0x87};
