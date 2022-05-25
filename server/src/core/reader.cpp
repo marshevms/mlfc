@@ -361,7 +361,16 @@ CpuIntelGen Reader::defineCpuIntelGen()
     unsigned int family = (eax >> 8) & 0xF;
     unsigned int model = (eax >> 4) & 0xF;
 
+    // Rocket Lake
     if (efamily == 0 && family == 6 && emodel == 10 && model == 7){
+        return CpuIntelGen::Gen11;
+    }
+
+    // Tiger Lake
+    if (efamily == 0 && family == 6 && emodel == 8 && model == 12){
+        return CpuIntelGen::Gen11;
+    }
+    if (efamily == 0 && family == 6 && emodel == 8 && model == 13){
         return CpuIntelGen::Gen11;
     }
 
