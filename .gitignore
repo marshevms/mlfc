@@ -9,3 +9,4 @@ CMakeCache.txt
 
 #build
 .build
+build/
