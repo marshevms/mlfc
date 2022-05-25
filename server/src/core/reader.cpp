@@ -4,6 +4,7 @@
 #include <system_error>
 #include <string>
 #include <string.h>
+#include <cpuid.h>
 
 namespace mlfc::core
 {
@@ -16,6 +17,7 @@ Reader::Reader()
     {
         file_.open(kECFilePath, std::fstream::in | std::fstream::binary);
         fanModeType_ = defineFanModeType();
+        cpuIntelGen_ = defineCpuIntelGen();
     }
     catch (std::ios_base::failure &e)
     {
@@ -52,9 +54,9 @@ int Reader::realtimeCPUFanRPM()
 {
     try
     {
-        file_.seekg(cpu::kRealtimeFanRPM[0]);
+        file_.seekg(cpu::kRealtimeFanRPM[static_cast<int>(cpuIntelGen_)][0]);
 
-        unsigned char data[cpu::kRealtimeFanRPM.size()];
+        unsigned char data[cpu::kRealtimeFanRPM[static_cast<int>(cpuIntelGen_)].size()];
         file_.read(reinterpret_cast<char*>(&data), sizeof (data));
 
         if(file_.gcount() != sizeof (data))
@@ -153,9 +155,9 @@ int Reader::realtimeGPUFanRPM()
 {
     try
     {
-        file_.seekg(gpu::kRealtimeFanRPM[0]);
+        file_.seekg(gpu::kRealtimeFanRPM[static_cast<int>(cpuIntelGen_)][0]);
 
-        unsigned char data[gpu::kRealtimeFanRPM.size()];
+        unsigned char data[gpu::kRealtimeFanRPM[static_cast<int>(cpuIntelGen_)].size()];
         file_.read(reinterpret_cast<char*>(&data), sizeof (data));
 
         if(file_.gcount() != sizeof (data))
@@ -306,6 +308,11 @@ FanModeType Reader::fanModeType()
     return fanModeType_;
 }
 
+CpuIntelGen Reader::cpuIntelgen()
+{
+    return cpuIntelGen_;
+}
+
 unsigned char Reader::fanModeValue()
 {
     unsigned char data = 0;
@@ -335,6 +342,39 @@ FanModeType Reader::defineFanModeType()
               << "on https://github.com/marshevms/mlfc/issues and mark it as \"unknown fan mode\"" << std:: endl;
 
     return FanModeType::TypeC;
+}
+
+CpuIntelGen Reader::defineCpuIntelGen()
+{
+    unsigned int eax = 0;
+    unsigned int ebx = 0;
+    unsigned int ecx = 0;
+    unsigned int edx = 0;
+
+    if (__get_cpuid(1, &eax, &ebx, &ecx, &edx) == 0){
+        std::cerr << "failed to check cpuid";
+        return CpuIntelGen::Default;
+    }
+
+    unsigned int efamily = (eax >> 20) & 0xFF;
+    unsigned int emodel = (eax >> 16) & 0xF;
+    unsigned int family = (eax >> 8) & 0xF;
+    unsigned int model = (eax >> 4) & 0xF;
+
+    // Rocket Lake
+    if (efamily == 0 && family == 6 && emodel == 10 && model == 7){
+        return CpuIntelGen::Gen11;
+    }
+
+    // Tiger Lake
+    if (efamily == 0 && family == 6 && emodel == 8 && model == 12){
+        return CpuIntelGen::Gen11;
+    }
+    if (efamily == 0 && family == 6 && emodel == 8 && model == 13){
+        return CpuIntelGen::Gen11;
+    }
+
+    return CpuIntelGen::Default;
 }
 
 } // namespace mlfc::core
