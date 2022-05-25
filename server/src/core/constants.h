@@ -12,9 +12,6 @@ static constexpr char kECFilePath[]{"/sys/kernel/debug/ec/ec0/io"};
 static constexpr char kECFilePath[]{"io"};
 #endif
 
-// CPU Info
-static constexpr char kCpuIntelGenInfoPath[]{"/sys/devices/cpu/caps/pmu_name"};
-
 static constexpr int kTempsNumber = 6;
 static constexpr int kFanSpeedsNumber = 7;
 
