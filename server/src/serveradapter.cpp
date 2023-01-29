@@ -2,18 +2,32 @@
 
 #include "server.h"
 
-namespace mlfc
-{
+namespace mlfc {
 
-ServerAdapter::ServerAdapter(QObject *parent)
-    :QDBusAbstractAdaptor(parent)
+ServerAdapter::ServerAdapter(QObject* parent)
+    : QDBusAbstractAdaptor(parent)
 {
     setAutoRelaySignals(true);
 }
 
-bool ServerAdapter::start()
+int ServerAdapter::realtimeCPUTemp()
 {
-    return reinterpret_cast<mlfc::Server*>(this->parent())->start();
+   return reinterpret_cast<mlfc::Server*>(this->parent())->realtimeCPUTemp();
+}
+
+int ServerAdapter::realtimeCPUFanRPM()
+{
+   return reinterpret_cast<mlfc::Server*>(this->parent())->realtimeCPUFanRPM();
+}
+
+int ServerAdapter::realtimeGPUTemp()
+{
+   return reinterpret_cast<mlfc::Server*>(this->parent())->realtimeGPUTemp();
+}
+
+int ServerAdapter::realtimeGPUFanRPM()
+{
+   return reinterpret_cast<mlfc::Server*>(this->parent())->realtimeGPUFanRPM();
 }
 
 core::FanMode ServerAdapter::fanMode()
@@ -84,17 +98,6 @@ QString ServerAdapter::serverVersion()
 QString ServerAdapter::ecVersion()
 {
     return reinterpret_cast<mlfc::Server*>(this->parent())->ecVersion();
-}
-
-
-bool ServerAdapter::setUpdateInterval(int interval)
-{
-    return reinterpret_cast<mlfc::Server*>(this->parent())->setUpdateInterval(interval);
-}
-
-int ServerAdapter::updateInterval() const
-{
-    return reinterpret_cast<mlfc::Server*>(this->parent())->updateInterval();
 }
 
 QString ServerAdapter::lastError() const

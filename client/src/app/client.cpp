@@ -23,6 +23,7 @@ Client::Client(QObject *parent)
     , fanMode_(FanMode::Unknown)
     , chartValues_(ChartValues::CPU)
     , iconTheme_(IconTheme::Unknown)
+
 {
 }
 
@@ -46,11 +47,22 @@ bool Client::start(CPU *cpu, GPU *gpu)
 
     server_ = new ServerInterface("com.github.mlfc.server", "/Server", QDBusConnection::systemBus(), this);
 
-    connect(server_, &ServerInterface::realtimeCPUTemp, this, &Client::setCpuTemp);
-    connect(server_, &ServerInterface::realtimeCPUFanRPM, this, &Client::setCpuFanRmp);
 
-    connect(server_, &ServerInterface::realtimeGPUTemp, this, &Client::setGpuTemp);
-    connect(server_, &ServerInterface::realtimeGPUFanRPM, this, &Client::setGpuFanRmp);
+    QTimer *oneSecTimer = new QTimer(this);
+    oneSecTimer->setInterval(1000);
+    connect(oneSecTimer, &QTimer::timeout, this, [=]{
+        this->setCpuFanRmp(server_->realtimeCPUFanRPM());
+        this->setCpuTemp(server_->realtimeCPUTemp());
+        this->setGpuTemp(server_->realtimeGPUTemp());
+        this->setGpuFanRmp(server_->realtimeGPUFanRPM());
+    });
+
+    oneSecTimer->start(1000);
+    //    connect(server_, , this, &Client::setCpuTemp);
+    //    connect(server_, &ServerInterface::realtimeCPUFanRPM, this, &Client::setCpuFanRmp);
+
+    //    connect(server_, &ServerInterface::realtimeGPUTemp, this, &Client::setGpuTemp);
+    //    connect(server_, &ServerInterface::realtimeGPUFanRPM, this, &Client::setGpuFanRmp);
 
     init();
     return true;
@@ -118,7 +130,7 @@ void Client::setCpuTemp(int temp)
 void Client::setCpuFanRmp(int rpm)
 {
     cpu_->setFanRpm(rpm);
-    //    qDebug() << "cpu: " << rpm;
+//    qDebug() << "cpu: " << rpm;
 }
 
 void Client::setGpuTemp(int temp)
@@ -308,10 +320,10 @@ void Client::setFanMode(const EnumerationStorage::FanMode fanMode)
 
 void Client::init()
 {
-    startServer();
+    //    startServer();
 
-    if (ServerStates::Working != serverState())
-        return;
+    //    if (ServerStates::Working != serverState())
+    //        return;
 
     updateFanMode();
     updateCoolerBoost();
@@ -323,7 +335,6 @@ void Client::init()
     updateGpuFanSpeeds();
 
     updateServerVersion();
-
     updateECVersion();
 
     QTimer *oneSecTimer = new QTimer(this);
@@ -507,14 +518,16 @@ void Client::updateECVersion()
         return;
     }
 
-    if(const auto ec = res.value(); ec.isEmpty())
+    const auto ec = res.value();
+    if(ec.isEmpty())
     {
         setCoolerBoost(CoolerBoost::Unknown);
         emit errorOccurred(serverLastError());
         return;
-    } else {
-        setECVersion(ec);
     }
+
+
+    setECVersion(ec);
 }
 
 
@@ -680,33 +693,33 @@ void Client::checkConfig()
 
 void Client::cmpAndChange(Client::CpuGpu &pair)
 {
-     auto tempsFanSpeeds = std::make_unique<QmlTempsFanSpeeds>();
+    auto tempsFanSpeeds = std::make_unique<QmlTempsFanSpeeds>();
 
-     //CPU
-     {
-         auto temps = cpu_->rTemps();
-         auto fanSpeeds = cpu_->rFanSpeeds();
-         model::TempsFanSpeeds cpuPair{{temps.begin(), temps.end()}, {fanSpeeds.begin(), fanSpeeds.end()}};
+    //CPU
+    {
+        auto temps = cpu_->rTemps();
+        auto fanSpeeds = cpu_->rFanSpeeds();
+        model::TempsFanSpeeds cpuPair{{temps.begin(), temps.end()}, {fanSpeeds.begin(), fanSpeeds.end()}};
 
-         if (!pair.cpu.isEqual(cpuPair))
-         {
-             tempsFanSpeeds->tempsFanSpeeds = std::move(pair.cpu);
-             onSaveChartValuesClicked(tempsFanSpeeds.get(),  ChartValues::CPU);
-         }
-     }
+        if (!pair.cpu.isEqual(cpuPair))
+        {
+            tempsFanSpeeds->tempsFanSpeeds = std::move(pair.cpu);
+            onSaveChartValuesClicked(tempsFanSpeeds.get(),  ChartValues::CPU);
+        }
+    }
 
-     //GPU
-     {
-         auto temps = gpu_->rTemps();
-         auto fanSpeeds = gpu_->rFanSpeeds();;
-         model::TempsFanSpeeds gpuPair{{temps.begin(), temps.end()}, {fanSpeeds.begin(), fanSpeeds.end()}};
+    //GPU
+    {
+        auto temps = gpu_->rTemps();
+        auto fanSpeeds = gpu_->rFanSpeeds();;
+        model::TempsFanSpeeds gpuPair{{temps.begin(), temps.end()}, {fanSpeeds.begin(), fanSpeeds.end()}};
 
-         if (!pair.gpu.isEqual(gpuPair))
-         {
-             tempsFanSpeeds->tempsFanSpeeds = std::move(pair.gpu);
-             onSaveChartValuesClicked(tempsFanSpeeds.get(),  ChartValues::GPU);
-         }
-     }
+        if (!pair.gpu.isEqual(gpuPair))
+        {
+            tempsFanSpeeds->tempsFanSpeeds = std::move(pair.gpu);
+            onSaveChartValuesClicked(tempsFanSpeeds.get(),  ChartValues::GPU);
+        }
+    }
 }
 
 void Client::setCpuTemps(const QVector<int> &temps)

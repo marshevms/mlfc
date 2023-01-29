@@ -3,6 +3,7 @@
 #include <QDBusServiceWatcher>
 #include <QDBusError>
 #include <QDebug>
+#include <iostream>
 #include <qdbusmetatype.h>
 
 #include "server.h"
@@ -22,25 +23,27 @@ void RegisterMetaType()
 
 int main(int argc, char **argv)
 {
-    QCoreApplication app(argc, argv);
+        QCoreApplication app(argc, argv);
 
-    QDBusServiceWatcher service_watcher("com.github.mlfc.client", QDBusConnection::systemBus()
-                                       , QDBusServiceWatcher::WatchForUnregistration);
+        QDBusServiceWatcher service_watcher("com.github.mlfc.client", QDBusConnection::systemBus()
+                                           , QDBusServiceWatcher::WatchForUnregistration);
 
-    QObject::connect(&service_watcher, &QDBusServiceWatcher::serviceUnregistered
-                     , &app, &QCoreApplication::quit);
+        QObject::connect(&service_watcher, &QDBusServiceWatcher::serviceUnregistered
+                         , &app, &QCoreApplication::quit);
 
-    RegisterMetaType();
+        RegisterMetaType();
 
-    mlfc::Server server;
+        mlfc::Server server;
 
-    auto *serverAdapter = new mlfc::ServerAdapter(&server);
+        auto *serverAdapter = new mlfc::ServerAdapter(&server);
 
-    if(!QDBusConnection::systemBus().registerService("com.github.mlfc.server")
-       || !QDBusConnection::systemBus().registerObject("/Server", &server))
-    {
-        qDebug() << QDBusConnection::systemBus().lastError().message();
-    }
+        std::cout << int(serverAdapter->coolerBoost());
 
-    return app.exec();
+        if(!QDBusConnection::systemBus().registerService("com.github.mlfc.server")
+           || !QDBusConnection::systemBus().registerObject("/Server", &server))
+        {
+            qDebug() << QDBusConnection::systemBus().lastError().message();
+        }
+
+        return app.exec();
 }

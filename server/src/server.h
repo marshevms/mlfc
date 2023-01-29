@@ -5,47 +5,38 @@
 
 #include <QObject>
 
-
 class QTimer;
 
-namespace mlfc::core
-{
+namespace mlfc::core {
 class Manager;
 enum class FanMode;
 enum class CoolerBoost;
 }
 
-namespace mlfc
-{
+namespace mlfc {
 
-class Server : public QObject
-{
+class Server : public QObject {
     Q_OBJECT
 public:
-
-    enum class ServerStatus
-    {
+    enum class ServerStatus {
         kON,
         kOFF
     };
 
-    explicit Server(QObject *parent = nullptr);
+    explicit Server(QObject* parent = nullptr);
     ~Server();
 
-
-    void setLastError(const QString &error);
+    void setLastError(const QString& error);
 
 signals:
-    void realtimeCPUTemp(int temp);
-    void realtimeCPUFanRPM(int rpm);
-
-    void realtimeGPUTemp(int temp);
-    void realtimeGPUFanRPM(int rpm);
-
     void anErrorOccured(QString error);
 
 public slots:
-    bool start();
+    int realtimeCPUTemp();
+    int realtimeCPUFanRPM();
+
+    int realtimeGPUTemp();
+    int realtimeGPUFanRPM();
 
     enum core::FanMode fanMode();
     enum core::CoolerBoost coolerBoost();
@@ -59,35 +50,23 @@ public slots:
     QVector<int> gpuTemps();
     QVector<int> gpuFanSpeeds();
 
-    bool setCPUTemps(QVector<int> &cpuTemps);
-    bool setCPUFanSpeeds(QVector<int> &cpuFanSpeeds);
+    bool setCPUTemps(QVector<int>& cpuTemps);
+    bool setCPUFanSpeeds(QVector<int>& cpuFanSpeeds);
 
-    bool setGPUTemps(QVector<int> &gpuTemps);
-    bool setGPUFanSpeeds(QVector<int> &gpuFanSpeeds);
+    bool setGPUTemps(QVector<int>& gpuTemps);
+    bool setGPUFanSpeeds(QVector<int>& gpuFanSpeeds);
 
     QString ecVersion();
-
-    bool setUpdateInterval(int interval);
-    int updateInterval() const;
 
     QString serverVersion();
 
     QString lastError() const;
 
 private:
-    static constexpr int kMinTimeoutSecs = 500;
-    static constexpr int kMaxTimeoutSecs = 3000;
-    static constexpr int kTimeoutSecs = 1000;
-
     ServerStatus server_status_;
-
-    QTimer *timer_;
     std::unique_ptr<core::Manager> manager_;
 
     QString last_error_;
-
-    void update();
-
 };
 
 } // namespace mlfc

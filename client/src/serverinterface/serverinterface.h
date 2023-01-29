@@ -1,28 +1,47 @@
 #ifndef SERVERINTERFACE_H
 #define SERVERINTERFACE_H
 
-#include <QObject>
 #include <QDBusAbstractInterface>
 #include <QDBusPendingReply>
+#include <QObject>
 
 #include "enumerationstorage.h"
 #include "utils.h"
 
+namespace mlfc {
 
-namespace mlfc
-{
-
-class ServerInterface : public QDBusAbstractInterface
-{
+class ServerInterface : public QDBusAbstractInterface {
     Q_OBJECT
 public:
-    ServerInterface(const QString &service, const QString &path, const QDBusConnection &connection, QObject *parent = nullptr);
+    ServerInterface(const QString& service, const QString& path, const QDBusConnection& connection, QObject* parent = nullptr);
     ~ServerInterface() = default;
 
-    static inline const char *staticInterfaceName()
-    { return "com.github.mlfc.server"; }
+    static inline const char* staticInterfaceName()
+    {
+        return "com.github.mlfc.server";
+    }
 
 public Q_SLOTS: // METHODS
+    inline QDBusPendingReply<int> realtimeCPUFanRPM()
+    {
+        return asyncCallWithArgumentList(QStringLiteral("realtimeCPUFanRPM"), {});
+    }
+
+    inline QDBusPendingReply<int> realtimeCPUTemp()
+    {
+        return asyncCallWithArgumentList(QStringLiteral("realtimeCPUTemp"), {});
+    }
+
+    inline QDBusPendingReply<int> realtimeGPUFanRPM()
+    {
+        return asyncCallWithArgumentList(QStringLiteral("realtimeGPUFanRPM"), {});
+    }
+
+    inline QDBusPendingReply<int> realtimeGPUTemp()
+    {
+        return asyncCallWithArgumentList(QStringLiteral("realtimeGPUTemp"), {});
+    }
+
     inline QDBusPendingReply<EnumerationStorage::CoolerBoost> coolerBoost()
     {
         QList<QVariant> argumentList;
@@ -49,28 +68,28 @@ public Q_SLOTS: // METHODS
         return asyncCallWithArgumentList(QStringLiteral("setFanMode"), argumentList);
     }
 
-    inline QDBusPendingReply<bool> setCPUTemps(const QVector<int> &setCPUTemps)
+    inline QDBusPendingReply<bool> setCPUTemps(const QVector<int>& setCPUTemps)
     {
         QList<QVariant> argumentList;
         argumentList << QVariant::fromValue(setCPUTemps);
         return asyncCallWithArgumentList(QStringLiteral("setCPUTemps"), argumentList);
     }
 
-    inline QDBusPendingReply<bool> setCPUFanSpeeds(const QVector<int> &setCPUFanSpeeds)
+    inline QDBusPendingReply<bool> setCPUFanSpeeds(const QVector<int>& setCPUFanSpeeds)
     {
         QList<QVariant> argumentList;
         argumentList << QVariant::fromValue(setCPUFanSpeeds);
         return asyncCallWithArgumentList(QStringLiteral("setCPUFanSpeeds"), argumentList);
     }
 
-    inline QDBusPendingReply<bool> setGPUTemps(const QVector<int> &setCPUTemps)
+    inline QDBusPendingReply<bool> setGPUTemps(const QVector<int>& setCPUTemps)
     {
         QList<QVariant> argumentList;
         argumentList << QVariant::fromValue(setCPUTemps);
         return asyncCallWithArgumentList(QStringLiteral("setGPUTemps"), argumentList);
     }
 
-    inline QDBusPendingReply<bool> setGPUFanSpeeds(const QVector<int> &setCPUFanSpeeds)
+    inline QDBusPendingReply<bool> setGPUFanSpeeds(const QVector<int>& setCPUFanSpeeds)
     {
         QList<QVariant> argumentList;
         argumentList << QVariant::fromValue(setCPUFanSpeeds);
@@ -135,11 +154,7 @@ public Q_SLOTS: // METHODS
     }
 
 Q_SIGNALS: // SIGNALS
-    void anErrorOccured(const QString &error);
-    void realtimeCPUFanRPM(int rpm);
-    void realtimeCPUTemp(int temp);
-    void realtimeGPUFanRPM(int rpm);
-    void realtimeGPUTemp(int temp);
+    void anErrorOccured(const QString& error);
 };
 
 }

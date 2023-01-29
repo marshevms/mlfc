@@ -1,270 +1,179 @@
 #include "manager.h"
 
 #include <fstream>
-#include <string.h>
 #include <sstream>
+#include <string.h>
 
-namespace mlfc::core
-{
+namespace mlfc::core {
 
-Manager::Manager() : Reader()
+Manager::Manager()
+    : Reader()
 {
 }
 
 void Manager::setCoolerBoost(enum CoolerBoost coolerboost)
 {
-    if(this->coolerBoost() == coolerboost)
-        return;
+    std::fstream file;
+    file.exceptions(std::fstream::failbit | std::fstream::badbit);
+    file.rdbuf()->pubsetbuf(0, 0);
 
-    try
-    {
-        std::fstream file;
-        openFileRW(file);
+    try {
+        file.open(cooler_boost_status_path, file.out);
 
-        unsigned char data = 0;
-
-        if(coolerboost == CoolerBoost::ONN)
-        {
-            data |= static_cast<unsigned char>(kCoolerBoostON);
-        }
-        else if(coolerboost == CoolerBoost::OFF)
-        {
-            data &= static_cast<unsigned char>(kCoolerBoostOFF) | 0x0F;
-        }
-        else
-        {
-            return;
+        switch (coolerboost) {
+        case CoolerBoost::ONN:
+            file << "onn";
+            break;
+        case CoolerBoost::OFF:
+            file << "off";
+            break;
+        case CoolerBoost::Unknown:
+            break;
         }
 
-        file.seekp(kCoolerBoost);
-        file.write(reinterpret_cast<char*>(&data), sizeof (data));
-        file.close();
-    }
-    catch (std::ios_base::failure &e)
-    {
+    } catch (std::ios_base::failure& e) {
         throw std::runtime_error(std::string(strerror(errno)));
     }
 }
 
 void Manager::setFanMode(enum FanMode fan_mode)
 {
-    if(this->fanMode() == fan_mode)
-        return;
+    std::fstream file;
+    file.exceptions(std::fstream::failbit | std::fstream::badbit);
+    file.rdbuf()->pubsetbuf(0, 0);
 
-    try
-    {
-        std::fstream file;
-        openFileRW(file);
+    try {
+        file.open(fan_mode_path, file.out);
 
-        unsigned char data = 0;
-
-        switch (fan_mode)
-        {
+        switch (fan_mode) {
         case FanMode::Auto:
-            data = kFanModeAuto[static_cast<int>(fanModeType())];
+            file << "auto";
             break;
         case FanMode::Basic:
-            data = kFanModeBasic[static_cast<int>(fanModeType())];
+            file << "basic";
             break;
         case FanMode::Advanced:
-            data = kFanModeAdvanced[static_cast<int>(fanModeType())];
+            file << "advanced";
             break;
         case FanMode::Unknown:
-            return;
+            break;
         }
 
-        file.seekp(kFanMode);
-        file.write(reinterpret_cast<char*>(&data), sizeof (data));
-        file.close();
-    }
-    catch (std::ios_base::failure &e)
-    {
+    } catch (std::ios_base::failure& e) {
         throw std::runtime_error(std::string(strerror(errno)));
     }
 }
 
-void Manager::setCPUTemps(const std::vector<int> &cpuTemps)
+void Manager::setCPUTemps(const std::vector<int>& cpuTemps)
 {
-    if (cpuTemps.size() != kTempsNumber)
-    {
-        std::ostringstream out;
-        out << "Size of cpu temps must be equeal " << kTempsNumber;
-        for(auto const & temp : cpuTemps)
-        {
-            out << temp << "  ";
-        }
-
-        throw std::logic_error(out.str());
+    if (cpuTemps.size() == 0) {
+        return;
     }
 
-    if (!checkArrayValue(cpuTemps))
-    {
-        throw  std::logic_error("Wrong set of cpu temps");
+    std::string res;
+    res.reserve(cpuTemps.size() * 3 + (cpuTemps.size() - 1));
+    res.append(std::to_string(cpuTemps[0]));
+
+    for (auto it = ++cpuTemps.begin(); it != cpuTemps.end(); ++it) {
+        res.append(",");
+        res.append(std::to_string(*it));
     }
 
-    try
-    {
-        std::fstream file;
-        openFileRW(file);
+    std::fstream file;
+    file.exceptions(std::fstream::failbit | std::fstream::badbit);
+    file.rdbuf()->pubsetbuf(0, 0);
 
-        file.seekp(cpu::kTemps[0]);
+    try {
+        file.open(cpu_temps_path, file.out);
+        file << res;
 
-        for(auto const & temp : cpuTemps)
-        {
-            unsigned char data = temp;
-            file.write(reinterpret_cast<char*>(&data), sizeof (data));
-        }
-
-        file.close();
-
-    }
-    catch (std::ios_base::failure &e)
-    {
+    } catch (std::ios_base::failure& e) {
         throw std::runtime_error(std::string(strerror(errno)));
     }
 }
 
-void Manager::setCPUFanSpeeds(const std::vector<int> &cpuFanSpeeds)
+void Manager::setCPUFanSpeeds(const std::vector<int>& cpuFanSpeeds)
 {
-    if (cpuFanSpeeds.size() != kFanSpeedsNumber)
-    {
-        std::ostringstream out;
-        out << "Size of cpu fan speeds must be equeal " << kFanSpeedsNumber;
-
-        throw std::logic_error(out.str());
+    if (cpuFanSpeeds.size() == 0) {
+        return;
     }
 
-    if (!checkArrayValue(cpuFanSpeeds))
-    {
-        throw  std::logic_error("Wrong set of cpu fan speeds");
+    std::string res;
+    res.reserve(cpuFanSpeeds.size() * 3 + (cpuFanSpeeds.size() - 1));
+    res.append(std::to_string(cpuFanSpeeds[0]));
+
+    for (auto it = ++cpuFanSpeeds.begin(); it != cpuFanSpeeds.end(); ++it) {
+        res.append(",");
+        res.append(std::to_string(*it));
     }
 
-    try
-    {
-        std::fstream file;
-        openFileRW(file);
+    std::fstream file;
+    file.exceptions(std::fstream::failbit | std::fstream::badbit);
+    file.rdbuf()->pubsetbuf(0, 0);
 
-        file.seekp(cpu::kFanSpeeds[0]);
+    try {
+        file.open(cpu_fan_speeds_path, file.out);
+        file << res;
 
-        for(auto const & fanSpeed : cpuFanSpeeds)
-        {
-            unsigned char data = fanSpeed;
-            file.write(reinterpret_cast<char*>(&data), sizeof (data));
-        }
-
-        file.close();
-
-    }
-    catch (std::ios_base::failure &e)
-    {
+    } catch (std::ios_base::failure& e) {
         throw std::runtime_error(std::string(strerror(errno)));
     }
 }
 
-void Manager::setGPUTemps(const std::vector<int> &gpuTemps)
+void Manager::setGPUTemps(const std::vector<int>& gpuTemps)
 {
-    if (gpuTemps.size() != kTempsNumber)
-    {
-        std::ostringstream out;
-        out << "Size of gpu temps must be equeal " << kTempsNumber;
-        for(auto const & temp : gpuTemps)
-        {
-            out << temp << "  ";
-        }
-
-        throw std::logic_error(out.str());
+    if (gpuTemps.size() == 0) {
+        return;
     }
 
-    if (!checkArrayValue(gpuTemps))
-    {
-        throw  std::logic_error("Wrong set of gpu temps");
+    std::string res;
+    res.reserve(gpuTemps.size() * 3 + (gpuTemps.size() - 1));
+    res.append(std::to_string(gpuTemps[0]));
+
+    for (auto it = ++gpuTemps.begin(); it != gpuTemps.end(); ++it) {
+        res.append(",");
+        res.append(std::to_string(*it));
     }
 
-    try
-    {
-        std::fstream file;
-        openFileRW(file);
+    std::fstream file;
+    file.exceptions(std::fstream::failbit | std::fstream::badbit);
+    file.rdbuf()->pubsetbuf(0, 0);
 
-        file.seekp(gpu::kTemps[0]);
+    try {
+        file.open(gpu_temps_path, file.out);
+        file << res;
 
-        for(auto const & temp : gpuTemps)
-        {
-            unsigned char data = temp;
-            file.write(reinterpret_cast<char*>(&data), sizeof (data));
-        }
-
-        file.close();
-
-    }
-    catch (std::ios_base::failure &e)
-    {
+    } catch (std::ios_base::failure& e) {
         throw std::runtime_error(std::string(strerror(errno)));
     }
 }
 
-void Manager::setGPUFanSpeeds(const std::vector<int> &gpuFanSpeeds)
+void Manager::setGPUFanSpeeds(const std::vector<int>& gpuFanSpeeds)
 {
-    if (gpuFanSpeeds.size() != kFanSpeedsNumber)
-    {
-        std::ostringstream out;
-        out << "Size of gpu fan speeds must be equeal " << kFanSpeedsNumber;
-
-        throw std::logic_error(out.str());
+    if (gpuFanSpeeds.size() == 0) {
+        return;
     }
 
-    if (!checkArrayValue(gpuFanSpeeds))
-    {
-        throw  std::logic_error("Wrong set of gpu fan speeds");
+    std::string res;
+    res.reserve(gpuFanSpeeds.size() * 3 + (gpuFanSpeeds.size() - 1));
+    res.append(std::to_string(gpuFanSpeeds[0]));
+
+    for (auto it = ++gpuFanSpeeds.begin(); it != gpuFanSpeeds.end(); ++it) {
+        res.append(",");
+        res.append(std::to_string(*it));
     }
 
-    try
-    {
-        std::fstream file;
-        openFileRW(file);
+    std::fstream file;
+    file.exceptions(std::fstream::failbit | std::fstream::badbit);
+    file.rdbuf()->pubsetbuf(0, 0);
 
-        file.seekp(gpu::kFanSpeeds[0]);
+    try {
+        file.open(gpu_fan_speeds_path, file.out);
+        file << res;
 
-        for(auto const & fanSpeed : gpuFanSpeeds)
-        {
-            unsigned char data = fanSpeed;
-            file.write(reinterpret_cast<char*>(&data), sizeof (data));
-        }
-
-        file.close();
-
-    }
-    catch (std::ios_base::failure &e)
-    {
+    } catch (std::ios_base::failure& e) {
         throw std::runtime_error(std::string(strerror(errno)));
     }
-}
-
-void Manager::openFileRW(std::fstream &file)
-{
-    file.exceptions(std::fstream::failbit);
-
-    try
-    {
-        file.open(kECFilePath, std::fstream::in | std::fstream::out | std::fstream::binary);
-    }
-    catch(std::ios_base::failure &e)
-    {
-        throw std::runtime_error(std::string(strerror(errno)));
-    }
-}
-
-bool Manager::checkArrayValue(const std::vector<int> &values)
-{
-    int oldValue = 0;
-    for(auto const &value : values)
-    {
-        if (value < oldValue || value > 100)
-            return false;
-
-        oldValue = value;
-    }
-
-    return true;
 }
 
 } // namespace mlfc::core

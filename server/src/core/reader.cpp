@@ -1,380 +1,306 @@
 #include "reader.h"
 
-#include <iostream>
-#include <system_error>
-#include <string>
-#include <string.h>
 #include <cpuid.h>
+#include <fstream>
+#include <iostream>
+#include <string.h>
+#include <string>
+#include <system_error>
 
-namespace mlfc::core
-{
+namespace mlfc::core {
 
-Reader::Reader()
-{
-    file_.exceptions(std::fstream::failbit);
+Reader::Reader() { }
 
-    try
-    {
-        file_.open(kECFilePath, std::fstream::in | std::fstream::binary);
-        fanModeType_ = defineFanModeType();
-        cpuIntelGen_ = defineCpuIntelGen();
-    }
-    catch (std::ios_base::failure &e)
-    {
-        throw std::runtime_error("An attempt to open the \"" + std::string(kECFilePath) + "\" file resulted in an error: " + std::string(strerror(errno)));
-    }
-}
-
-Reader::~Reader()
-{
-
-}
+Reader::~Reader() { }
 
 int Reader::realtimeCPUTemp()
 {
-    try
-    {
-        file_.seekg(cpu::kRealtimeTemp);
+    std::fstream file;
+    file.exceptions(std::fstream::failbit | std::fstream::badbit);
+    file.rdbuf()->pubsetbuf(0, 0);
 
-        unsigned char data = 0;
-        file_.read(reinterpret_cast<char*>(&data), sizeof (data));
+    std::string buf;
+    buf.resize(3);
 
-        if(file_.gcount() != sizeof (data))
-            return -2;
-
-        return static_cast<int>(data);
+    try {
+        file.open(realtime_cpu_temp_path, file.in);
+        file.getline(buf.data(), buf.size());
+    } catch (std::ios_base::failure& e) {
+        throw std::runtime_error(std::string(strerror(errno)));
     }
-    catch (std::ios_base::failure &e)
-    {
-        throw std::runtime_error("While reading realtime CPU temp: " + std::string(strerror(errno)));
-    }
+
+    return std::stoi(buf);
 }
 
 int Reader::realtimeCPUFanRPM()
 {
-    try
-    {
-        file_.seekg(cpu::kRealtimeFanRPM[static_cast<int>(cpuIntelGen_)][0]);
+    std::fstream file;
+    file.exceptions(std::fstream::failbit | std::fstream::badbit);
+    file.rdbuf()->pubsetbuf(0, 0);
 
-        unsigned char data[cpu::kRealtimeFanRPM[static_cast<int>(cpuIntelGen_)].size()];
-        file_.read(reinterpret_cast<char*>(&data), sizeof (data));
+    std::string buf;
+    buf.resize(5);
 
-        if(file_.gcount() != sizeof (data))
-            return -2;
-
-        int rpm = ((0 | data[0]) << 8) | data[1];
-
-        if(!rpm)
-            return 0;
-
-        return kFanRPM / rpm;
+    try {
+        file.open(realtime_cpu_fan_rpm_path, file.in);
+        file.getline(buf.data(), buf.size());
+    } catch (std::ios_base::failure& e) {
+        throw std::runtime_error(std::string(strerror(errno)));
     }
-    catch (std::ios_base::failure &e)
-    {
-        throw std::runtime_error("While reading realtime CPU fan rpm: " + std::string(strerror(errno)));
-    }
+
+    return std::stoi(buf);
 }
 
 std::vector<int> Reader::cpuTemps()
 {
-    try
-    {
-        file_.seekg(cpu::kTemps[0]);
+    std::fstream file;
+    file.exceptions(std::fstream::failbit | std::fstream::badbit);
+    file.rdbuf()->pubsetbuf(0, 0);
 
-        unsigned char data[cpu::kTemps.size()];
-        file_.read(reinterpret_cast<char*>(&data), sizeof (data));
+    std::string buf;
+    buf.resize(6 * 3 + 6);
 
-        if(file_.gcount() != cpu::kTemps.size())
-            return {};
-
-        std::vector<int> res;
-        res.reserve(cpu::kTemps.size());
-
-        for(size_t i = 0; i < cpu::kTemps.size(); ++i)
-        {
-            res.push_back(data[i]);
-        }
-
-        return res;
+    try {
+        file.open(cpu_temps_path, file.in);
+        file.getline(buf.data(), buf.size());
+    } catch (std::ios_base::failure& e) {
+        throw std::runtime_error(std::string(strerror(errno)));
     }
-    catch (std::ios_base::failure &e)
-    {
-        throw std::runtime_error("While reading CPU temps: " + std::string(strerror(errno)));
+
+    std::vector<int> res;
+    res.reserve(6);
+
+    size_t pos_start = 0;
+    size_t pos_end = 0;
+    std::string delim(",");
+    while ((pos_end = buf.find(delim, pos_start)) != std::string::npos) {
+        auto token = buf.substr(pos_start, pos_end - pos_start);
+        pos_start = pos_end + delim.length();
+        res.push_back(std::stoi(token));
     }
+    if (pos_start < buf.size()){
+        res.push_back(std::stoi(buf.substr(pos_start)));
+    }
+
+    return res;
 }
 
 std::vector<int> Reader::cpuFanSpeeds()
 {
-    try
-    {
-        file_.seekg(cpu::kFanSpeeds[0]);
+    std::fstream file;
+    file.exceptions(std::fstream::failbit | std::fstream::badbit);
+    file.rdbuf()->pubsetbuf(0, 0);
+    file.rdbuf()->pubsetbuf(0, 0);
 
-        unsigned char data[cpu::kFanSpeeds.size()];
-        file_.read(reinterpret_cast<char*>(&data), sizeof (data));
+    std::string buf;
+    buf.resize(7 * 3 + 7);
 
-        if(file_.gcount() != cpu::kFanSpeeds.size())
-            return {};
-
-        std::vector<int> res;
-        res.reserve(cpu::kFanSpeeds.size());
-
-        for(size_t i = 0; i < cpu::kFanSpeeds.size(); ++i)
-        {
-            res.push_back(data[i]);
-        }
-
-        return res;
+    try {
+        file.open(cpu_fan_speeds_path, file.in);
+        file.getline(buf.data(), buf.size());
+    } catch (std::ios_base::failure& e) {
+        throw std::runtime_error(std::string(strerror(errno)));
     }
-    catch (std::ios_base::failure &e)
-    {
-        throw std::runtime_error("While reading CPU fan speeds: " + std::string(strerror(errno)));
+
+    std::vector<int> res;
+    res.reserve(7);
+
+    size_t pos_start = 0;
+    size_t pos_end = 0;
+    std::string delim(",");
+    while ((pos_end = buf.find(delim, pos_start)) != std::string::npos) {
+        auto token = buf.substr(pos_start, pos_end - pos_start);
+        pos_start = pos_end + delim.length();
+        res.push_back(std::stoi(token));
     }
+    if (pos_start < buf.size()){
+        res.push_back(std::stoi(buf.substr(pos_start)));
+    }
+
+    return res;
+    ;
 }
 
 int Reader::realtimeGPUTemp()
 {
-    try
-    {
-        file_.seekg(gpu::kRealtimeTemp);
+    std::fstream file;
+    file.exceptions(std::fstream::failbit | std::fstream::badbit);
+    file.rdbuf()->pubsetbuf(0, 0);
 
-        unsigned char data = 0;
-        file_.read(reinterpret_cast<char*>(&data), sizeof (data));
+    std::string buf;
+    buf.resize(3);
 
-        if(file_.gcount() != sizeof (data))
-            return -2;
-
-        return static_cast<int>(data);
+    try {
+        file.open(realtime_gpu_temp_path, file.in);
+        file.getline(buf.data(), buf.size());
+    } catch (std::ios_base::failure& e) {
+        throw std::runtime_error(std::string(strerror(errno)));
     }
-    catch (std::ios_base::failure &e)
-    {
-        throw std::runtime_error("While reading realtime GPU temp: " + std::string(strerror(errno)));
-    }
+
+    return std::stoi(buf);
 }
 
 int Reader::realtimeGPUFanRPM()
 {
-    try
-    {
-        file_.seekg(gpu::kRealtimeFanRPM[static_cast<int>(cpuIntelGen_)][0]);
+    std::fstream file;
+    file.exceptions(std::fstream::failbit | std::fstream::badbit);
+    file.rdbuf()->pubsetbuf(0, 0);
 
-        unsigned char data[gpu::kRealtimeFanRPM[static_cast<int>(cpuIntelGen_)].size()];
-        file_.read(reinterpret_cast<char*>(&data), sizeof (data));
-
-        if(file_.gcount() != sizeof (data))
-            return -2;
-
-        int rpm = ((0 | data[0]) << 8) | data[1];
-
-        if(!rpm)
-            return 0;
-
-        return kFanRPM / rpm;
+    std::string buf;
+    buf.resize(5);
+    try {
+        file.open(realtime_gpu_fan_rpm_path, file.in);
+        file.getline(buf.data(), buf.size());
+    } catch (std::ios_base::failure& e) {
+        throw std::runtime_error(std::string(strerror(errno)));
     }
-    catch (std::ios_base::failure &e)
-    {
-        throw std::runtime_error("While reading realtime GPU fan rpm: " + std::string(strerror(errno)));
-    }
+
+    return std::stoi(buf);
 }
 
 std::vector<int> Reader::gpuTemps()
 {
-    try
-    {
-        file_.seekg(gpu::kTemps[0]);
+    std::fstream file;
+    file.exceptions(std::fstream::failbit | std::fstream::badbit);
+    file.rdbuf()->pubsetbuf(0, 0);
 
-        unsigned char data[gpu::kTemps.size()];
-        file_.read(reinterpret_cast<char*>(&data), sizeof (data));
+    std::string buf;
+    buf.resize(6 * 3 + 6);
 
-        if(file_.gcount() != gpu::kTemps.size())
-            return {};
+    try {
 
-        std::vector<int> res;
-        res.reserve(gpu::kTemps.size());
-
-        for(size_t i = 0; i < gpu::kTemps.size(); ++i)
-        {
-            res.push_back(data[i]);
-        }
-
-        return res;
+        file.open(gpu_temps_path, file.in);
+        file.getline(buf.data(), buf.size());
+    } catch (std::ios_base::failure& e) {
+        throw std::runtime_error(std::string(strerror(errno)));
     }
-    catch (std::ios_base::failure &e)
-    {
-        throw std::runtime_error("While reading GPU temps: " + std::string(strerror(errno)));
+
+    std::vector<int> res;
+    res.reserve(6);
+
+    size_t pos_start = 0;
+    size_t pos_end = 0;
+    std::string delim(",");
+    while ((pos_end = buf.find(delim, pos_start)) != std::string::npos) {
+        auto token = buf.substr(pos_start, pos_end - pos_start);
+        pos_start = pos_end + delim.length();
+        res.push_back(std::stoi(token));
     }
+    if (pos_start < buf.size()){
+        res.push_back(std::stoi(buf.substr(pos_start)));
+    }
+
+    return res;
 }
 
 std::vector<int> Reader::gpuFanSpeeds()
 {
-    try
-    {
-        file_.seekg(gpu::kFanSpeeds[0]);
+    std::fstream file;
+    file.exceptions(std::fstream::failbit | std::fstream::badbit);
+    file.rdbuf()->pubsetbuf(0, 0);
+    file.rdbuf()->pubsetbuf(0, 0);
 
-        unsigned char data[gpu::kFanSpeeds.size()];
-        file_.read(reinterpret_cast<char*>(&data), sizeof (data));
+    std::string buf;
+    buf.resize(7 * 3 + 7);
 
-        if(file_.gcount() != gpu::kFanSpeeds.size())
-            return {};
-
-        std::vector<int> res;
-        res.reserve(gpu::kFanSpeeds.size());
-
-        for(size_t i = 0; i < gpu::kFanSpeeds.size(); ++i)
-        {
-            res.push_back(data[i]);
-        }
-
-        return res;
+    try {
+        file.open(gpu_fan_speeds_path, file.in);
+        file.getline(buf.data(), buf.size());
+    } catch (std::ios_base::failure& e) {
+        throw std::runtime_error(std::string(strerror(errno)));
     }
-    catch (std::ios_base::failure &e)
-    {
-        throw std::runtime_error("While reading GPU fan speeds: " + std::string(strerror(errno)));
+
+    std::vector<int> res;
+    res.reserve(7);
+
+    size_t pos_start = 0;
+    size_t pos_end = 0;
+    std::string delim(",");
+    while ((pos_end = buf.find(delim, pos_start)) != std::string::npos) {
+        auto token = buf.substr(pos_start, pos_end - pos_start);
+        pos_start = pos_end + delim.length();
+        res.push_back(std::stoi(token));
     }
+    if (pos_start < buf.size()){
+        res.push_back(std::stoi(buf.substr(pos_start)));
+    }
+
+    return res;
 }
 
 FanMode Reader::fanMode()
 {
-    try
-    {
-        if (const auto value = static_cast<int>(fanModeValue()); value == kFanModeAuto[static_cast<int>(fanModeType_)]){
-            return FanMode::Auto;
-        } else if (value == kFanModeBasic[static_cast<int>(fanModeType_)]){
-            return FanMode::Basic;
-        } else if (value == kFanModeAdvanced[static_cast<int>(fanModeType_)]){
-            return FanMode::Advanced;
-        } else {
-            throw std::runtime_error(std::string("While reading fan mode: ") + "unknown fan mode: " + std::to_string(value));
-        }
+    std::fstream file;
+    file.exceptions(std::fstream::failbit | std::fstream::badbit);
+    file.rdbuf()->pubsetbuf(0, 0);
 
+    std::string buf;
+    buf.resize(10);
+
+    try {
+        file.open(fan_mode_path, file.in);
+        file.getline(buf.data(), buf.size());
+    } catch (std::ios_base::failure& e) {
+        throw std::runtime_error(std::string(strerror(errno)));
     }
-    catch (std::ios_base::failure &e)
-    {
-        throw std::runtime_error("While reading fan mode: " + std::string(strerror(errno)));
+
+    if ((buf.find("auto")) != std::string::npos) {
+        return FanMode::Auto;
     }
+    if ((buf.find("basic")) != std::string::npos) {
+        return FanMode::Basic;
+    }
+    if ((buf.find("advanced")) != std::string::npos) {
+        return FanMode::Advanced;
+    }
+
+    return FanMode::Unknown;
 }
 
 CoolerBoost Reader::coolerBoost()
 {
-    try
-    {
-        file_.seekg(kCoolerBoost);
+    std::fstream file;
+    file.exceptions(std::fstream::failbit | std::fstream::badbit);
+    file.rdbuf()->pubsetbuf(0, 0);
 
-        unsigned char data = 0;
-        file_.read(reinterpret_cast<char*>(&data), sizeof (data));
+    std::string buf;
+    buf.resize(4);
 
-        if(file_.gcount() != sizeof (data))
-            throw std::runtime_error(std::string("While reading cooler boost: ") + "read " + std::to_string(file_.gcount()) + " byte(s), "
-                                     + "should read " + std::to_string(data) + "byte(s)");
 
-        if(!(static_cast<int>(data) & kCoolerBoostON))
-            return CoolerBoost::OFF;
-        else
-            return CoolerBoost::ONN;
-
+    try {
+        file.open(cooler_boost_status_path, file.in);
+        file.getline(buf.data(), buf.size());
+    } catch (std::ios_base::failure& e) {
+        throw std::runtime_error(std::string(strerror(errno)));
     }
-    catch (std::ios_base::failure &e)
-    {
-        throw std::runtime_error("While reading cooler boost: " + std::string(strerror(errno)));
+
+    if ((buf.find("onn")) != std::string::npos) {
+        return CoolerBoost::ONN;
     }
+    if ((buf.find("off")) != std::string::npos) {
+        return CoolerBoost::OFF;
+    }
+
+    return CoolerBoost::Unknown;
 }
 
 std::string Reader::ecVersion()
 {
-    try
-    {
-        char ec[kECVersion.second];
+    std::fstream file;
+    file.exceptions(std::fstream::failbit | std::fstream::badbit);
+    file.rdbuf()->pubsetbuf(0, 0);
 
-        file_.seekg(kECVersion.first);
+    std::string buf;
+    buf.resize(20);
 
-        file_.read(ec, kECVersion.second);
-
-        if(file_.gcount() != kECVersion.second)
-            throw std::runtime_error(std::string("While reading ec version: ") + "read " + std::to_string(file_.gcount()) + " byte(s), "
-                                     + "should read " + std::to_string(kECVersion.second) + "byte(s)");
-
-        return {ec, kECVersion.second};
-
-    }
-    catch (std::ios_base::failure &e)
-    {
-        throw std::runtime_error("While reading ec version: " + std::string(strerror(errno)));
+    try {
+        file.open(ec_version_path, file.in);
+        file.getline(buf.data(), buf.size());
+    } catch (std::ios_base::failure& e) {
+        throw std::runtime_error(std::string(strerror(errno)));
     }
 
-    return {};
-}
-
-FanModeType Reader::fanModeType()
-{
-    return fanModeType_;
-}
-
-CpuIntelGen Reader::cpuIntelgen()
-{
-    return cpuIntelGen_;
-}
-
-unsigned char Reader::fanModeValue()
-{
-    unsigned char data = 0;
-
-    file_.seekg(kFanMode);
-    file_.read(reinterpret_cast<char*>(&data), sizeof (data));
-
-    if(file_.gcount() != sizeof (data))
-        throw std::runtime_error(std::string("While reading fan mode: ") + "read " + std::to_string(file_.gcount()) + " byte(s), "
-                                 + "should read " + std::to_string(data) + "byte(s)");
-
-    return data;
-}
-
-// TODO think about ec version
-FanModeType Reader::defineFanModeType()
-{
-    static constexpr unsigned char mask = 0x3;   //      0000 0011
-    auto data = fanModeValue();                  // OD - 0000 1101
-
-    switch (auto value = data & mask; value) {
-    case 0: return FanModeType::TypeC;
-    case 1: return FanModeType::TypeD;
-    }
-
-    std::cerr << "fan_mode value is " << std::hex << static_cast<int>(data)  << ", please create the issue\n"
-              << "on https://github.com/marshevms/mlfc/issues and mark it as \"unknown fan mode\"" << std:: endl;
-
-    return FanModeType::TypeC;
-}
-
-CpuIntelGen Reader::defineCpuIntelGen()
-{
-    unsigned int eax = 0;
-    unsigned int ebx = 0;
-    unsigned int ecx = 0;
-    unsigned int edx = 0;
-
-    if (__get_cpuid(1, &eax, &ebx, &ecx, &edx) == 0){
-        std::cerr << "failed to check cpuid";
-        return CpuIntelGen::Default;
-    }
-
-    unsigned int efamily = (eax >> 20) & 0xFF;
-    unsigned int emodel = (eax >> 16) & 0xF;
-    unsigned int family = (eax >> 8) & 0xF;
-    unsigned int model = (eax >> 4) & 0xF;
-
-    // Rocket Lake
-    if (efamily == 0 && family == 6 && emodel == 10 && model == 7){
-        return CpuIntelGen::Gen11;
-    }
-
-    // Tiger Lake
-    if (efamily == 0 && family == 6 && emodel == 8 && model == 12){
-        return CpuIntelGen::Gen11;
-    }
-    if (efamily == 0 && family == 6 && emodel == 8 && model == 13){
-        return CpuIntelGen::Gen11;
-    }
-
-    return CpuIntelGen::Default;
+    return buf;
 }
 
 } // namespace mlfc::core

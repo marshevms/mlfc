@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QPoint>
+#include <QThread>
 
 #include "serverinterface.h"
 #include "enumerationstorage.h"
@@ -111,6 +112,8 @@ private:
     IconTheme iconTheme_;
 
     QString lastError_;
+
+    QThread thread_;
 
     void setCoolerBoost(const mlfc::EnumerationStorage::CoolerBoost coolerBoost);
     void setFanMode(const mlfc::EnumerationStorage::FanMode fanMode);
